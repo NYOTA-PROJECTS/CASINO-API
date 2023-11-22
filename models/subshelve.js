@@ -11,12 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      SubShelve.belongsTo(models.Shelve, { foreignKey: 'shelveId', onDelete: 'CASCADE' });
     }
   }
   SubShelve.init({
-    ShelveId: DataTypes.STRING,
-    name: DataTypes.STRING,
-    image: DataTypes.STRING
+    ShelveId: DataTypes.INTEGER,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      minLength: 3
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   }, {
     sequelize,
     modelName: 'SubShelve',
