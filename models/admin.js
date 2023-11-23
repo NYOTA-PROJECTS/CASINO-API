@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class SubShelve extends Model {
+  class Admin extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,23 +11,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      SubShelve.belongsTo(models.Shelve, { foreignKey: 'shelveId', onDelete: 'CASCADE' });
     }
   }
-  SubShelve.init({
-    ShelveId: DataTypes.INTEGER,
-    name: {
+  Admin.init({
+    email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      minLength: 3
+      unique: true,
+      allowNull: false
     },
-    imageUrl: {
+    password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     }
   }, {
     sequelize,
-    modelName: 'SubShelve',
+    modelName: 'Admin',
   });
-  return SubShelve;
+  return Admin;
 };

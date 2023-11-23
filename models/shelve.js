@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       minLength: 3,
       allowNull: false,
     },
-    image: {
+    imageUrl: {
       type: DataTypes.STRING,
       allowNull: false,
     }
