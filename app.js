@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
+const shopRoute = require('./routes/shopRoutes');
 
 // Initialize express app
 const app = express();
@@ -29,11 +30,12 @@ app.use((err, req, res, next) => {
 // limiteur de requête d'access au serveur
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: "Trop de requêtes. Veuillez reessayer dans 15 minutes."
-})
+    max: 20,
+    message: "Trop de requêtes. Veuillez reessayer dans 15 minutes.",
+});
 
 // Routes
+app.use('/api/v1/shop', shopRoute, limiter);
 
 // Démarrage serveur
 const PORT = process.env.PORT || 3000;
