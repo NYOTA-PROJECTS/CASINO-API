@@ -142,9 +142,9 @@ router.get("/list-all", adminTokenMiddleware, shelveController.getShelvesList);
 
 /**
  * @swagger
- * /api/v1/shelve/update:
+ * /api/v1/shelve/update-name:
  *   put:
- *     summary: Mettre à jour un rayon
+ *     summary: Mettre à jour le nom d'un rayon
  *     tags:
  *       - Rayons
  *     parameters:
@@ -208,7 +208,7 @@ router.get("/list-all", adminTokenMiddleware, shelveController.getShelvesList);
  *               status: error
  *               message: Une erreur s'est produite lors de la mise à jour du rayon.
  */
-router.put("/update", adminTokenMiddleware, shelveController.updateShelve);
+router.put("/update-name", adminTokenMiddleware, shelveController.updateShelve);
 
 /**
  * @swagger

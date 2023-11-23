@@ -15,11 +15,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   SubShelve.init({
-    ShelveId: DataTypes.INTEGER,
+    ShelveId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      minLength: 3
+      validate: {
+        len: {
+          args: [3],
+          msg: 'Le nom du sous-rayon doit avoir au moins 3 caractères.',
+        },
+      },
     },
     imageUrl: {
       type: DataTypes.STRING,

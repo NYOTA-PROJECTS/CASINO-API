@@ -41,7 +41,7 @@ const createShelve = async (req, res) => {
       });
     }
 
-    // Utilisation de Sharp pour redimensionner l'image à 200x200
+    // Utilisation de Sharp pour redimensionner l'image à 250x250
     const resizedImagePath = path.join(
       __dirname,
       "..",
