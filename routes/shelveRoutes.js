@@ -328,4 +328,61 @@ router.put("/update-image", adminTokenMiddleware, upload.single("image"), shelve
  */
 router.delete('/delete', adminTokenMiddleware, shelveController.deleteShelve);
 
+/**
+ * @swagger
+ * /api/v1/shelve/count:
+ *   get:
+ *     summary: Compter le nombre de rayons
+ *     description: Renvoie le nombre total de rayons.
+ *     tags:
+ *       - Rayons
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         type: string
+ *         description: Jeton d'authentification (Bearer token)
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie le nombre total de rayons.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 count:
+ *                   type: integer
+ *                   example: 5
+ *       401:
+ *         description: Non autorisé - Jeton non fourni ou invalide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Token non fourni ou invalide.
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Une erreur s'est produite lors du comptage des rayons.
+ */
+router.get("/count", adminTokenMiddleware, shelveController.countShelves);
+
 module.exports = router;

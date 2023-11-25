@@ -1,8 +1,7 @@
 const sharp = require("sharp");
 const fs = require("fs");
-const jwt = require("jsonwebtoken");
 const path = require("path");
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 const { Shop, Shelve } = require("../models");
 
 // Create new Shelve
@@ -97,7 +96,7 @@ const getShelvesList = async (req, res) => {
       include: [
         {
           model: Shop,
-          attributes: ['id', "name"],
+          attributes: ["id", "name"],
         },
       ],
       attributes: ["id", "name", "imageUrl", "createdAt"],
@@ -135,8 +134,8 @@ const updateShelve = async (req, res) => {
 
     if (!existingShelve) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Rayon non trouvé.',
+        status: "error",
+        message: "Rayon non trouvé.",
       });
     }
 
@@ -151,8 +150,9 @@ const updateShelve = async (req, res) => {
 
     if (otherShelveWithSameName) {
       return res.status(409).json({
-        status: 'error',
-        message: 'Un autre rayon avec le même nom existe déjà pour cette boutique.',
+        status: "error",
+        message:
+          "Un autre rayon avec le même nom existe déjà pour cette boutique.",
       });
     }
 
@@ -170,14 +170,14 @@ const updateShelve = async (req, res) => {
     };
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       shelve: shelveResponse,
     });
   } catch (error) {
     console.error(`ERROR UPDATING SHELVE: ${error}`);
     res.status(500).json({
-      status: 'error',
-      message: 'Une erreur s\'est produite lors de la mise à jour du rayon.',
+      status: "error",
+      message: "Une erreur s'est produite lors de la mise à jour du rayon.",
     });
   }
 };
@@ -191,33 +191,31 @@ const updateShelveImage = async (req, res) => {
 
     if (!existingShelve) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Rayon non trouvé.',
+        status: "error",
+        message: "Rayon non trouvé.",
       });
     }
 
     // Vérifiez si une nouvelle image a été téléchargée
     if (!req.file) {
       return res.status(400).json({
-        status: 'error',
-        message: 'Aucune nouvelle image fournie.',
+        status: "error",
+        message: "Aucune nouvelle image fournie.",
       });
     }
 
     // Utilisation de Sharp pour redimensionner la nouvelle image
     const resizedImagePath = path.join(
       __dirname,
-      '..',
-      'public/uploads/shelves',
+      "..",
+      "public/uploads/shelves",
       `resized_${req.file.filename}`
     );
 
-    await sharp(req.file.path)
-      .resize(250, 250)
-      .toFile(resizedImagePath);
+    await sharp(req.file.path).resize(250, 250).toFile(resizedImagePath);
 
     const newImageUrl = `${req.protocol}://${req.get(
-      'host'
+      "host"
     )}/uploads/shelves/resized_${req.file.filename}`;
 
     // Mise à jour de l'image du rayon
@@ -229,17 +227,18 @@ const updateShelveImage = async (req, res) => {
       name: updatedShelve.name,
       imageUrl: updatedShelve.imageUrl,
       updatedAt: updatedShelve.updatedAt,
-    }
+    };
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       shelve: shelveResponse,
     });
   } catch (error) {
     console.error(`ERROR UPDATING SHELVE IMAGE: ${error}`);
     res.status(500).json({
-      status: 'error',
-      message: 'Une erreur s\'est produite lors de la mise à jour de l\'image du rayon.',
+      status: "error",
+      message:
+        "Une erreur s'est produite lors de la mise à jour de l'image du rayon.",
     });
   }
 };
@@ -254,8 +253,8 @@ const deleteShelve = async (req, res) => {
 
     if (!existingShelve) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Rayon non trouvé.',
+        status: "error",
+        message: "Rayon non trouvé.",
       });
     }
 
@@ -263,16 +262,41 @@ const deleteShelve = async (req, res) => {
     await existingShelve.destroy();
 
     res.status(200).json({
-      status: 'success',
-      message: 'Rayon supprimé avec succès.',
+      status: "success",
+      message: "Rayon supprimé avec succès.",
     });
   } catch (error) {
     console.error(`ERROR DELETING SHELVE: ${error}`);
     res.status(500).json({
-      status: 'error',
-      message: 'Une erreur s\'est produite lors de la suppression du rayon.',
+      status: "error",
+      message: "Une erreur s'est produite lors de la suppression du rayon.",
     });
   }
 };
 
-module.exports = { createShelve, getShelvesList, updateShelve, updateShelveImage, deleteShelve };
+const countShelves = async (req, res) => {
+  try {
+    // Compter le nombre total de produits
+    const shelveCount = await Shelve.count();
+
+    res.status(200).json({
+      status: "success",
+      count: shelveCount || 0,
+    });
+  } catch (error) {
+    console.error(`ERROR COUNTING SHELVES: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors du comptage des rayons.",
+    });
+  }
+};
+
+module.exports = {
+  createShelve,
+  getShelvesList,
+  updateShelve,
+  updateShelveImage,
+  deleteShelve,
+  countShelves,
+};

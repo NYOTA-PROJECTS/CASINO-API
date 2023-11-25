@@ -265,10 +265,29 @@ const updateSubShelveImage = async (req, res) => {
   }
 };
 
+const countSubShelve = async (req, res) => {
+  try {
+    // Compter le nombre total de sous-rayons
+    const subShelveCount = await SubShelve.count();
+
+    res.status(200).json({
+      status: "success",
+      count: subShelveCount || 0,
+    });
+  } catch (error) {
+    console.error(`ERROR COUNTING SOUS-RAYONS: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors du comptage des sous-rayons.",
+    });
+  }
+};
+
 module.exports = {
   createSubShelve,
   updateShelveName,
   getSubShelvesList,
   deleteSubShelve,
   updateSubShelveImage,
+  countSubShelve,
 };

@@ -214,4 +214,61 @@ router.delete('/delete', adminTokenMiddleware, shopController.deleteShop);
  */
 router.get('/list-all', adminTokenMiddleware, shopController.allShop);
 
+/**
+ * @swagger
+ * /api/v1/shop/count:
+ *   get:
+ *     summary: Compter le nombre de boutiques
+ *     description: Renvoie le nombre total de boutiques.
+ *     tags:
+ *       - Boutiques
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         type: string
+ *         description: Jeton d'authentification (Bearer token)
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie le nombre total de boutiques.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 count:
+ *                   type: integer
+ *                   example: 5
+ *       401:
+ *         description: Non autorisé - Jeton non fourni ou invalide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Token non fourni ou invalide.
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Une erreur s'est produite lors du comptage des boutiques.
+ */
+router.get("/count", adminTokenMiddleware, shopController.countShops);
+
 module.exports = router;

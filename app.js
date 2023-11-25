@@ -10,6 +10,7 @@ const shopRoutes = require("./routes/shopRoutes");
 const shelveRoutes = require("./routes/shelveRoutes");
 const subshelveRoutes = require("./routes/subshelveRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const productRoutes = require("./routes/productRoutes");
 const fs = require("fs");
 
 // Initialize express app
@@ -59,6 +60,14 @@ const createUploadsSubShelvesFolder = (req, res, next) => {
   next();
 };
 
+const createUploadsProductsFolder = (req, res, next) => {
+  const folderPath = "public/uploads/products";
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+  next();
+};
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -86,6 +95,8 @@ app.use("/api/v1/shop", shopRoutes, limiter);
 app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes, limiter);
 app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes, limiter);
 app.use("/api/v1/admin", adminRoutes, limiter);
+app.use("/api/v1/product", createUploadsProductsFolder, productRoutes, limiter);
+
 
 // Démarrage serveur
 const PORT = process.env.PORT || 3000;
