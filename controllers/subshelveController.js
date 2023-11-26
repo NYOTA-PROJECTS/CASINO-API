@@ -2,11 +2,43 @@ const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
 const { Op } = require("sequelize");
-const { SubShelve, Shelve } = require("../models");
+const { Shop, SubShelve, Shelve } = require("../models");
 
 const createSubShelve = async (req, res) => {
   try {
-    const { shelveId, name } = req.body;
+    const { shopId, shelveId, name } = req.body;
+
+    if (!shopId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID de la boutique manquant.",
+      });
+    }
+
+    if (!shelveId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID du rayon manquant.",
+      });
+    }
+
+    if (!name) {
+      return res.status(400).json({
+        status: "error",
+        message: "Nom du sous-rayon manquant.",
+      });
+    }
+
+
+    // Vérifier si la boutique  existe
+    const existingShop = await Shop.findByPk(shopId);
+
+    if (!existingShop) {
+      return res.status(404).json({
+        status: "error",
+        message: "Boutique non trouvé.",
+      });
+    }
 
     // Vérifier si le rayon (Shelve) existe
     const existingShelve = await Shelve.findByPk(shelveId);
@@ -49,7 +81,8 @@ const createSubShelve = async (req, res) => {
 
     // Créer le sous-rayon
     const newSubShelve = await SubShelve.create({
-      ShelveId: shelveId,
+      shopId: shopId,
+      shelveId: shelveId,
       name,
       imageUrl: req.file
         ? `${req.protocol}://${req.get("host")}/uploads/subshelves/resized_${
@@ -60,7 +93,8 @@ const createSubShelve = async (req, res) => {
 
     const subShelveResponse = {
       id: newSubShelve.id,
-      shelveId: newSubShelve.ShelveId,
+      shopId: newSubShelve.shopId,
+      shelveId: newSubShelve.shelveId,
       name: newSubShelve.name,
       imageUrl: newSubShelve.imageUrl,
       createdAt: newSubShelve.createdAt,
@@ -79,11 +113,49 @@ const createSubShelve = async (req, res) => {
   }
 };
 
-const updateShelveName = async (req, res) => {
+const updateSubShelveName = async (req, res) => {
   try {
-    const { shelveId, newName } = req.body;
+    const { shopId, shelveId, subShelveId, name } = req.body;
 
-    // Vérifiez si le rayon existe
+    if (!shopId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID de la boutique manquant.",
+      });
+    }
+
+    if (!shelveId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID du rayon manquant.",
+      });
+    }
+
+    if (!subShelveId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID du sous-rayon manquant.",
+      });
+    }
+
+    if (!name) {
+      return res.status(400).json({
+        status: "error",
+        message: "Nom du sous-rayon manquant.",
+      });
+    }
+
+    // Vérifier si la boutique existe
+    const existingShop = await Shop.findByPk(shopId);
+
+    if (!existingShop) {
+      return res.status(404).json({
+        status: "error",
+        message: "Boutique non trouvée.",
+      });
+    }
+
+    // Vérifier si le rayon (Shelve) existe
     const existingShelve = await Shelve.findByPk(shelveId);
 
     if (!existingShelve) {
@@ -93,45 +165,57 @@ const updateShelveName = async (req, res) => {
       });
     }
 
-    // Vérifiez si le nouveau nom est déjà utilisé pour le même magasin (évitez les conflits)
-    const otherShelveWithSameName = await Shelve.findOne({
-      where: {
-        name: newName,
-        shopId: existingShelve.shopId,
-        id: { [Op.not]: shelveId }, // Exclure le rayon actuel de la recherche
-      },
-    });
+    // Vérifier si le sous-rayon existe
+    const existingSubShelve = await SubShelve.findByPk(subShelveId);
 
-    if (otherShelveWithSameName) {
-      return res.status(409).json({
+    if (!existingSubShelve) {
+      return res.status(404).json({
         status: "error",
-        message:
-          "Un autre rayon avec le même nom existe déjà pour cette boutique.",
+        message: "Sous-rayon non trouvé.",
       });
     }
 
-    // Mise à jour du nom du rayon
-    await existingShelve.update({
-      name: newName,
+    // Vérifier si le nouveau nom est déjà utilisé pour le même rayon et sous-rayon dans la même boutique
+    const otherSubShelveWithSameName = await SubShelve.findOne({
+      where: {
+        name: name,
+        ShelveId: existingShelve.id,
+        shopId: existingShop.id,
+        id: { [Op.not]: subShelveId }, // Exclure le sous-rayon actuel de la recherche
+      },
     });
 
-    const shelveResponse = {
-      id: existingShelve.id,
-      name: newName,
-      shopId: existingShelve.shopId,
-      createdAt: existingShelve.createdAt,
+    if (otherSubShelveWithSameName) {
+      return res.status(409).json({
+        status: "error",
+        message:
+          "Un autre sous-rayon avec le même nom existe déjà pour ce rayon et cette boutique.",
+      });
+    }
+
+    // Mise à jour du nom du sous-rayon
+    await existingSubShelve.update({
+      name: name,
+    });
+
+    const subShelveResponse = {
+      id: existingSubShelve.id,
+      name: name,
+      shopId: existingSubShelve.shopId,
+      shelveId: existingSubShelve.shelveId,
+      createdAt: existingSubShelve.createdAt,
     };
 
     res.status(200).json({
       status: "success",
-      shelve: shelveResponse,
+      subShelve: subShelveResponse,
     });
   } catch (error) {
-    console.error(`ERROR UPDATING SHELVE NAME: ${error}`);
+    console.error(`ERROR UPDATING SUBSHELVE: ${error}`);
     res.status(500).json({
       status: "error",
       message:
-        "Une erreur s'est produite lors de la mise à jour du nom du rayon.",
+        "Une erreur s'est produite lors de la mise à jour du sous-rayon.",
     });
   }
 };
@@ -144,15 +228,22 @@ const getSubShelvesList = async (req, res) => {
         {
           model: Shelve,
           attributes: ["id", "name"], // Sélectionnez uniquement les attributs nécessaires du rayon parent
+          include: [
+            {
+              model: Shop,
+              attributes: ["id"], // Sélectionnez uniquement l'ID de la boutique parente
+            },
+          ],
         },
       ],
-      attributes: ["id", "name", "imageUrl", "createdAt"], // Sélectionnez les attributs nécessaires du sous-rayon
+      attributes: ["id", "shelveId", "name", "imageUrl", "createdAt"], // Sélectionnez les attributs nécessaires du sous-rayon
     });
 
     // Transformez les données au besoin pour la réponse
     const subShelvesResponse = subShelvesList.map((subShelve) => ({
       id: subShelve.id,
-      shelveId: subShelve.Shelve.id,
+      shopId: subShelve.Shelve.Shop.id,
+      shelveId: subShelve.shelveId, // Utilisez le nom correct de l'attribut shelveId
       shelveName: subShelve.Shelve.name,
       name: subShelve.name,
       imageUrl: subShelve.imageUrl,
@@ -285,7 +376,7 @@ const countSubShelve = async (req, res) => {
 
 module.exports = {
   createSubShelve,
-  updateShelveName,
+  updateSubShelveName,
   getSubShelvesList,
   deleteSubShelve,
   updateSubShelveImage,

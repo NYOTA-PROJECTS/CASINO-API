@@ -15,7 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   SubShelve.init({
-    ShelveId: {
+    shelveId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    shopId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },

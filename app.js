@@ -12,6 +12,7 @@ const shelveRoutes = require("./routes/shelveRoutes");
 const subshelveRoutes = require("./routes/subshelveRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/productRoutes");
+const deliverymanRoutes = require("./routes/deliverymanRoutes");
 const fs = require("fs");
 
 // Initialize express app
@@ -97,11 +98,13 @@ const limiter = rateLimit({
 
 // Routes
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use("/api/v1/shop", shopRoutes, limiter);
-app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes, limiter);
-app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes, limiter);
-app.use("/api/v1/admin", adminRoutes, limiter);
-app.use("/api/v1/product", createUploadsProductsFolder, productRoutes, limiter);
+app.use("/api/v1/shop", limiter, shopRoutes, );
+app.use("/api/v1/shelve", createUploadsShelvesFolder,limiter, shelveRoutes, );
+app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, limiter, subshelveRoutes, );
+app.use("/api/v1/admin", limiter, adminRoutes);
+app.use("/api/v1/product", createUploadsProductsFolder, limiter, productRoutes );
+app.use("/api/v1/deliverymen", limiter, deliverymanRoutes);
+
 
 // Créer le serveur HTTPS
 // const httpsServer = https.createServer(credentials, app);

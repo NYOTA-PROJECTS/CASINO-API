@@ -272,7 +272,7 @@ router.post("/create", adminTokenMiddleware, upload.single('image'), subshelveCo
  *                   type: string
  *                   example: Une erreur s'est produite lors de la mise à jour du nom du rayon.
  */
-router.put("/update-name", adminTokenMiddleware, subshelveController.updateShelveName);
+router.put("/update-name", adminTokenMiddleware, subshelveController.updateSubShelveName);
 
 /**
  * @swagger
