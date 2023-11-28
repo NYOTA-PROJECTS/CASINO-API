@@ -12,8 +12,18 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       SubShelve.belongsTo(models.Shelve, { foreignKey: 'shelveId', onDelete: 'CASCADE' });
+      SubShelve.belongsTo(models.Shop, { foreignKey: 'shopId', onDelete: 'CASCADE' });
+    }
+    static findByShopAndShelve(shopId, shelveId) {
+      return this.findAll({
+        where: {
+          shopId,
+          shelveId,
+        },
+      });
     }
   }
+  
   SubShelve.init({
     shelveId: {
       type: DataTypes.INTEGER,

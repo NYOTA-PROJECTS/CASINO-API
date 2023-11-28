@@ -47,6 +47,13 @@ const createProduct = async (req, res) => {
       });
     }
 
+    if (barcode.length !== 12) {
+      return res.status(400).json({
+        status: "error",
+        message: "Le code-barres doit contenir 12 chiffres minimum.",
+      });
+    }
+
     // Vérifier si le code-barres du produit existe
     const existingBarcode = await Product.findOne({
       where: {
@@ -299,42 +306,52 @@ const updateImage = async (req, res) => {
 
 const listProducts = async (req, res) => {
   try {
-    // Utilisez la méthode findAll pour récupérer tous les produits avec les informations associées
-    const productsList = await Product.findAll({
-      include: [
-        {
-          model: Shop,
-          attributes: ["name"],
-        },
-        {
-          model: Shelve,
-          attributes: ["name"],
-        },
-        {
-          model: SubShelve,
-          attributes: ["name"],
-        },
-      ],
-      attributes: ["id", "name", "imageUrl", "brcode", "price", "updatedAt"],
-      order: [["name", "ASC"]],
+    const shopId = req.headers.shopid;
+    const shelveId = req.headers.shelveid;
+    const subShelveId = req.headers.subshelveid;
+
+    const shop = await Shop.findByPk(shopId);
+    console.log(`ID SHOP: ${shopId}, ID SHELVE: ${shelveId}, ID SUBSHELVE: ${subShelveId}`);
+    if (!shop) {
+      return res.status(404).json({ status: "error", message: "Aucun produit trouvé pour cette boutique" });
+    }
+
+    const shelve = await Shelve.findOne({
+      where: {
+        id: shelveId,
+        shopId: shopId,
+      },
     });
 
-    // Retourne la liste des produits avec les informations associées
-    const productsResponse = productsList.map((product) => ({
-      id: product.id,
-      name: product.name,
-      shopName: product.Shop.name,
-      shelveName: product.Shelve.name,
-      subShelveName: product.SubShelve.name,
-      imageUrl: product.imageUrl,
-      barcode: product.brcode,
-      price: product.price,
-      updatedAt: product.updatedAt,
-    }));
+    if (!shelve) {
+      return res.status(404).json({ status: "error", message: "Aucun produit dans ce rayon" });
+    }
+
+    const subShelve = await SubShelve.findOne({
+      where: {
+        id: subShelveId,
+        shopId: shopId,
+        shelveId: shelveId,
+      },
+    });
+
+    if (!subShelve) {
+      return res.status(404).json({ status: "error", message: "Aucun produit dans ce sous-rayon" });
+    }
+
+    const products = await Product.findAll({
+      where: {
+        shopId: shopId,
+        shelveId: shelveId,
+        subShelveId: subShelveId,
+      },
+      attributes: ['id', 'name', 'imageUrl', 'brcode', 'price'],
+      order: [['name', 'ASC']],
+    });
 
     res.status(200).json({
       status: "success",
-      products: productsResponse,
+      products: products,
     });
   } catch (error) {
     console.error(`ERROR LISTING PRODUCTS: ${error}`);

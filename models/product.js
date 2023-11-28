@@ -11,15 +11,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Product.belongsTo(models.Shop, { foreignKey: 'shopId', onDelete: 'CASCADE' });
-      Product.belongsTo(models.Shelve, { foreignKey: 'shelveId', onDelete: 'CASCADE' });
-      Product.belongsTo(models.SubShelve, { foreignKey: 'subShelveId', onDelete: 'CASCADE' });
+      Product.belongsTo(models.Shop, { foreignKey: 'ShopId', onDelete: 'CASCADE' });
+      Product.belongsTo(models.Shelve, { foreignKey: 'ShelveId', onDelete: 'CASCADE' });
+      Product.belongsTo(models.SubShelve, { foreignKey: 'SubShelveId', onDelete: 'CASCADE' });
     }
   }
   Product.init({
-    ShopId: DataTypes.INTEGER,
-    ShelveId: DataTypes.INTEGER,
-    SubShelveId: DataTypes.INTEGER,
+    shopId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    shelveId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    subShelveId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -28,9 +37,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    brcode: DataTypes.STRING,
+    brcode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     price: {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.DOUBLE(10, 2),
       allowNull: false,
     }
   }, {

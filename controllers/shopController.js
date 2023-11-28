@@ -86,7 +86,7 @@ const updateShop = async (req, res) => {
 
 // Delete shop by Id
 const deleteShop = async (req, res) => {
-  const idShop = req.headers.shopID;
+  const idShop = req.headers.shopid;
   try {
     const shop = await Shop.findByPk(idShop);
     if (!shop) {

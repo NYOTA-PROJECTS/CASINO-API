@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      ShopId: {
+      shopId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Shops',
@@ -18,7 +18,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      ShelveId: {
+      shelveId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Shelves',
@@ -27,7 +27,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      SubShelveId: {
+      subShelveId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'SubShelves',

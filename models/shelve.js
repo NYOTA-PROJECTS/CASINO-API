@@ -12,12 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Shelve.belongsTo(models.Shop, { foreignKey: 'shopId', onDelete: 'CASCADE' });
-      Shelve.hasMany(models.Product, { foreignKey: 'shelveId', onDelete: 'CASCADE' });
       Shelve.hasMany(models.SubShelve, { foreignKey: 'shelveId', onDelete: 'CASCADE' });
     }
   }
   Shelve.init({
-    shopId: DataTypes.INTEGER,
+    shopId:{
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING,
       minLength: 3,

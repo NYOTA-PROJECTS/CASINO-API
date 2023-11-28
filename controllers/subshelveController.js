@@ -222,38 +222,61 @@ const updateSubShelveName = async (req, res) => {
 
 const getSubShelvesList = async (req, res) => {
   try {
-    // Utilisez la méthode findAll pour récupérer tous les sous-rayons avec les informations associées
-    const subShelvesList = await SubShelve.findAll({
-      include: [
-        {
-          model: Shelve,
-          attributes: ["id", "name"], // Sélectionnez uniquement les attributs nécessaires du rayon parent
-          include: [
-            {
-              model: Shop,
-              attributes: ["id"], // Sélectionnez uniquement l'ID de la boutique parente
-            },
-          ],
-        },
-      ],
-      attributes: ["id", "shelveId", "name", "imageUrl", "createdAt"], // Sélectionnez les attributs nécessaires du sous-rayon
+    const shopId = req.headers.shopid; // Récupérez shopId depuis l'en-tête
+    const shelveId = req.headers.shelveid; // Récupérez shelveId depuis l'en-tête
+
+    if (!shopId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID de la boutique manquant.",
+      })
+    }
+
+    if (!shelveId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID du rayon manquant.",
+      })
+    }
+
+    // Vérifiez si la boutique, le rayon existent
+    const existingShop = await Shop.findByPk(shopId);
+    const existingShelve = await Shelve.findByPk(shelveId);
+
+    if (!existingShop) {
+      return res.status(404).json({
+        status: "error",
+        message: "Boutique non trouvée.",
+      });
+    }
+
+    if (!existingShelve) {
+      return res.status(404).json({
+        status: "error",
+        message: "Rayon non trouvé.",
+      });
+    }
+
+    // Récupérez les sous-rayons en fonction de l'ID de la boutique et du rayon
+    const sousRayons = await SubShelve.findByShopAndShelve(shopId, shelveId, {
+      order: [["name", "ASC"]],
     });
 
-    // Transformez les données au besoin pour la réponse
-    const subShelvesResponse = subShelvesList.map((subShelve) => ({
-      id: subShelve.id,
-      shopId: subShelve.Shelve.Shop.id,
-      shelveId: subShelve.shelveId, // Utilisez le nom correct de l'attribut shelveId
-      shelveName: subShelve.Shelve.name,
-      name: subShelve.name,
-      imageUrl: subShelve.imageUrl,
-      createdAt: subShelve.createdAt,
+    // Formatez les données pour la réponse
+    const listeSousRayons = sousRayons.map((sousRayon) => ({
+      id: sousRayon.id,
+      idBoutique: sousRayon.shopId,
+      idRayon: sousRayon.shelveId,
+      nom: sousRayon.name,
+      image: sousRayon.imageUrl,
+      createdAt: sousRayon.createdAt,
     }));
 
     res.status(200).json({
       status: "success",
-      subShelves: subShelvesResponse,
+      subShelves: listeSousRayons,
     });
+
   } catch (error) {
     console.error(`ERROR GETTING SUBSHELVES LIST: ${error}`);
     res.status(500).json({
@@ -266,7 +289,7 @@ const getSubShelvesList = async (req, res) => {
 
 const deleteSubShelve = async (req, res) => {
   try {
-    const subShelveId = req.headers.subShelveID;
+    const subShelveId = req.headers.subshelveid;
 
     // Vérifiez si le sous-rayon existe
     const existingSubShelve = await SubShelve.findByPk(subShelveId);

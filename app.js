@@ -108,17 +108,18 @@ app.use("/api/v1/deliverymen", limiter, deliverymanRoutes);
 
 // Créer le serveur HTTPS
 // const httpsServer = https.createServer(credentials, app);
-const httpsServer = https.createServer(credentials, app);
+ const httpsServer = https.createServer(credentials, app);
 
 // Démarrage serveur
 const PORT = process.env.PORT || 3000;
 httpsServer.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
 });
-
+ 
 
 // Démarrage serveur
-/* const PORT = process.env.PORT || 3000;
+/*  const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-}); */
+}); 
+ */

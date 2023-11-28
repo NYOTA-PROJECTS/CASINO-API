@@ -92,6 +92,7 @@ const listDeliverymen = async (req, res) => {
         // Récupérer la liste de tous les livreurs
         const deliverymenList = await Deliveryman.findAll({
             attributes: ['id', 'name', 'phone', 'email'],
+            order: [['name', 'ASC']],
         });
 
         res.status(200).json({

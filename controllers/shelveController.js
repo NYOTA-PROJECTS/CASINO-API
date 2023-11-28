@@ -91,8 +91,10 @@ const createShelve = async (req, res) => {
 // Get list of all shelve order by created date
 const getShelvesList = async (req, res) => {
   try {
+    const shopId = req.headers.shopid; 
     // Utilisez la méthode findAll pour récupérer tous les rayons avec les informations associées
     const shelvesList = await Shelve.findAll({
+       where: { shopId: shopId }, 
       include: [
         {
           model: Shop,
@@ -113,7 +115,7 @@ const getShelvesList = async (req, res) => {
     }));
 
     res.status(200).json({
-      status: "successee",
+      status: "success",
       shelves: shelvesResponse,
     });
   } catch (error) {
