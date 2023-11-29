@@ -6,7 +6,33 @@ const { Shop, Shelve, SubShelve, Product } = require("../models");
 
 const createProduct = async (req, res) => {
   try {
-    const { shopId, shelveId, subShelveId, name, barcode, price } = req.body;
+    const shopId = req.headers.shopid;
+    const shelveId = req.headers.shelveid;
+    const subShelveId = req.headers.subshelveid;
+    const { name, barcode, price } = req.body;
+
+    console.log(`ID SHOP: ${shopId}, ID SHELVE: ${shelveId}, ID SUBSHELVE: ${subShelveId}, NAME: ${name}, BARCODE: ${barcode}, PRICE: ${price}`);
+
+    if (!shopId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID de la boutique manquant.",
+      });
+    }
+
+    if (!shelveId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID du rayon manquant.",
+      });
+    }
+
+    if (!subShelveId) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID du sous-rayon manquant.",
+      });
+    }
 
     // Vérifier si la boutique, le rayon et le sous-rayon existent
     const existingShop = await Shop.findByPk(shopId);
@@ -40,6 +66,7 @@ const createProduct = async (req, res) => {
         name: name,
       },
     });
+
     if (existingProductName) {
       return res.status(409).json({
         status: "error",
@@ -47,7 +74,7 @@ const createProduct = async (req, res) => {
       });
     }
 
-    if (barcode.length !== 12) {
+    if (barcode.length < 12) {
       return res.status(400).json({
         status: "error",
         message: "Le code-barres doit contenir 12 chiffres minimum.",
@@ -60,6 +87,7 @@ const createProduct = async (req, res) => {
         brcode: barcode,
       },
     });
+
     if (existingBarcode) {
       return res.status(409).json({
         status: "error",
@@ -112,9 +140,9 @@ const createProduct = async (req, res) => {
 
     // Créer le produit
     const newProduct = await Product.create({
-      ShopId: shopId,
-      ShelveId: shelveId,
-      SubShelveId: subShelveId,
+      shopId: shopId,
+      shelveId: shelveId,
+      subShelveId: subShelveId,
       name: name,
       imageUrl: productImageUrl,
       brcode: barcode,

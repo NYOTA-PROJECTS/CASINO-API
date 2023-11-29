@@ -40,9 +40,9 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 // Charger les certificats SSL
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
+/* const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/fullchain.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+const credentials = { key: privateKey, cert: certificate }; */
 
 // Mogan logger
 app.use(morgan("combined"));
@@ -89,7 +89,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Erreur serveur." });
 });
 
-// limiteur de requête d'access au serveur
+// limiteur de requête d'access au serveur d'un client sur un certain temps
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -98,28 +98,27 @@ const limiter = rateLimit({
 
 // Routes
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use("/api/v1/shop", limiter, shopRoutes, );
-app.use("/api/v1/shelve", createUploadsShelvesFolder,limiter, shelveRoutes, );
-app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, limiter, subshelveRoutes, );
-app.use("/api/v1/admin", limiter, adminRoutes);
-app.use("/api/v1/product", createUploadsProductsFolder, limiter, productRoutes );
-app.use("/api/v1/deliverymen", limiter, deliverymanRoutes);
+app.use("/api/v1/shop", shopRoutes, );
+app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes, );
+app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes, );
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/product", createUploadsProductsFolder, productRoutes );
+app.use("/api/v1/deliverymen", deliverymanRoutes);
 
 
 // Créer le serveur HTTPS
 // const httpsServer = https.createServer(credentials, app);
- const httpsServer = https.createServer(credentials, app);
+ //const httpsServer = https.createServer(credentials, app);
 
 // Démarrage serveur
-const PORT = process.env.PORT || 3000;
+/* const PORT = process.env.PORT || 3000;
 httpsServer.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-});
+}); */
  
 
 // Démarrage serveur
-/*  const PORT = process.env.PORT || 3000;
+ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
 }); 
- */
