@@ -1,16 +1,16 @@
 const express = require("express");
-const deliverymanController = require("../controllers/deliverymanController");
+const orderpickerController = require("../controllers/orderpickerController");
 const adminTokenMiddleware = require("../middlewares/adminTokenMiddleware");
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/deliveryman/create:
+ * /api/v1/orderpicker/create:
  *   post:
- *     summary: Crée un livreur
- *     description: Crée un nouveau livreur avec le nom, le numéro de téléphone, l'email et le mot de passe fournis.
+ *     summary: Crée un Preparateur de Commandes
+ *     description: Crée un nouveau preparateur de commandes avec le nom, le numéro de téléphone, l'email et le mot de passe fournis.
  *     tags:
- *       - Livreur
+ *       - Preparateur de Commandes
  *     parameters:
  *       - in: header
  *         name: Authorization
@@ -31,23 +31,23 @@ const router = express.Router();
  *           properties:
  *             name:
  *               type: string
- *               description: Le nom du livreur
+ *               description: Le nom du preparateur de commandes
  *               example: John Doe
  *             phone:
  *               type: string
- *               description: Le numéro de portable du livreur
+ *               description: Le numéro de portable du preparateur de commandes
  *               example: 066000000
  *             email:
  *               type: string
- *               description: L'email du livreur
+ *               description: L'email du preparateur de commandes
  *               example: john.doe@example.com
  *             password:
  *               type: string
- *               description: Le mot de passe du livreur
+ *               description: Le mot de passe du preparateur de commandes
  *               example: MotDePasseSecret
  *     responses:
  *       200:
- *         description: Succès - Renvoie les informations du livreur créé.
+ *         description: Succès - Renvoie les informations du preparateur de commandes créé.
  *         content:
  *           application/json:
  *             schema:
@@ -77,7 +77,7 @@ const router = express.Router();
  *                       format: date-time
  *                       example: 2023-01-01T12:00:00Z
  *       409:
- *         description: Conflit - Un livreur avec le même nom et numéro de téléphone existe déjà.
+ *         description: Conflit - Un preparateur de commandes avec le même nom et numéro de téléphone existe déjà.
  *         content:
  *           application/json:
  *             schema:
@@ -101,18 +101,18 @@ const router = express.Router();
  *                   example: error
  *                 message:
  *                   type: string
- *                   example: Une erreur s'est produite lors de la création du livreur.
+ *                   example: Une erreur s'est produite lors de la création du preparateur de commandes.
  */
-router.post("/create", adminTokenMiddleware, deliverymanController.createDeliveryman);
+router.post("/create", adminTokenMiddleware, orderpickerController.createOrderPicker);
 
 /**
  * @swagger
- * /api/v1/deliveryman/delete:
+ * /api/v1/orderpicker/delete:
  *   delete:
- *     summary: Supprime un livreur
- *     description: Supprime un livreur en fonction de son ID. Le token d'authentification Bearer est requis dans le header.
+ *     summary: Supprime un Preparateur de Commandes
+ *     description: Supprime un preparateur de commandes en fonction de son ID. Le token d'authentification Bearer est requis dans le header.
  *     tags:
- *       - Livreur
+ *       - Preparateur de Commandes
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -122,13 +122,13 @@ router.post("/create", adminTokenMiddleware, deliverymanController.createDeliver
  *         required: true
  *         description: Token d'authentification Bearer.
  *       - in: header
- *         name: DeliverymanId
+ *         name: OrderpickerId
  *         type: integer
  *         required: true
- *         description: ID du livreur à supprimer.
+ *         description: ID du preparateur de commandes à supprimer.
  *     responses:
  *       200:
- *         description: Succès - Livreur supprimé avec succès.
+ *         description: Succès - Preparateur de commandes supprimé avec succès.
  *         content:
  *           application/json:
  *             schema:
@@ -139,9 +139,9 @@ router.post("/create", adminTokenMiddleware, deliverymanController.createDeliver
  *                   example: success
  *                 message:
  *                   type: string
- *                   example: Livreur supprimé avec succès.
+ *                   example: Preparateur de commandes supprimé avec succès.
  *       404:
- *         description: Non trouvé - Aucun livreur trouvé avec l'ID fourni.
+ *         description: Non trouvé - Aucun preparateur de commandes trouvé avec l'ID fourni.
  *         content:
  *           application/json:
  *             schema:
@@ -152,7 +152,7 @@ router.post("/create", adminTokenMiddleware, deliverymanController.createDeliver
  *                   example: error
  *                 message:
  *                   type: string
- *                   example: Livreur non trouvé.
+ *                   example: Preparateur de commandes non trouvé.
  *       500:
  *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
  *         content:
@@ -165,18 +165,18 @@ router.post("/create", adminTokenMiddleware, deliverymanController.createDeliver
  *                   example: error
  *                 message:
  *                   type: string
- *                   example: Une erreur s'est produite lors de la suppression du livreur.
+ *                   example: Une erreur s'est produite lors de la suppression du preparateur de commandes.
  */
-router.delete("/delete", adminTokenMiddleware, deliverymanController.deleteDeliveryman);
+router.delete("/delete", adminTokenMiddleware, orderpickerController.deleteOrderPicker);
 
 /**
  * @swagger
  * /api/v1/deliveryman/list-all:
  *   get:
- *     summary: Liste tous les livreurs
- *     description: Récupère la liste de tous les livreurs avec leurs ID, nom, téléphone et email. Le token d'authentification Bearer est requis dans le header.
+ *     summary: Liste tous les preparateur de Commandes
+ *     description: Récupère la liste de tous les preparateur de Commandes avec leurs ID, nom, téléphone et email. Le token d'authentification Bearer est requis dans le header.
  *     tags:
- *       - Livreur
+ *       - Preparateur de Commandes
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -232,6 +232,6 @@ router.delete("/delete", adminTokenMiddleware, deliverymanController.deleteDeliv
  *                   type: string
  *                   example: Une erreur s'est produite lors de la récupération de la liste des livreurs.
  */
-router.get("/list-all", adminTokenMiddleware, deliverymanController.listDeliverymen);
+router.get("/list-all", adminTokenMiddleware, orderpickerController.listOrderPicker);
 
 module.exports = router;

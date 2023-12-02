@@ -13,6 +13,7 @@ const subshelveRoutes = require("./routes/subshelveRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/productRoutes");
 const deliverymanRoutes = require("./routes/deliverymanRoutes");
+const orderpickerRoutes = require("./routes/orderpickerRoutes");
 const fs = require("fs");
 
 // Initialize express app
@@ -104,6 +105,7 @@ app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes, );
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/product", createUploadsProductsFolder, productRoutes );
 app.use("/api/v1/deliveryman", deliverymanRoutes);
+app.use("/api/v1/orderpicker", orderpickerRoutes);
 
 
 // Créer le serveur HTTPS
@@ -113,11 +115,11 @@ const httpsServer = https.createServer(credentials, app);
 const PORT = process.env.PORT || 3000;
 httpsServer.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-}); 
+});
  
 
 // Démarrage serveur
-/*  const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+// const PORT = process.env.PORT || 3000;
+/*app.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
 });  */

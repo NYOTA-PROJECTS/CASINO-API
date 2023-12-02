@@ -11,8 +11,6 @@ const createProduct = async (req, res) => {
     const subShelveId = req.headers.subshelveid;
     const { name, barcode, price } = req.body;
 
-    console.log(`ID SHOP: ${shopId}, ID SHELVE: ${shelveId}, ID SUBSHELVE: ${subShelveId}, NAME: ${name}, BARCODE: ${barcode}, PRICE: ${price}`);
-
     if (!shopId) {
       return res.status(400).json({
         status: "error",
@@ -74,10 +72,10 @@ const createProduct = async (req, res) => {
       });
     }
 
-    if (barcode.length < 12) {
+    if (barcode.length < 8) {
       return res.status(400).json({
         status: "error",
-        message: "Le code-barres doit contenir 12 chiffres minimum.",
+        message: "Le code-barres doit contenir 8 chiffres minimum.",
       });
     }
 

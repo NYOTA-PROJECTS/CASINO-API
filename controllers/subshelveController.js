@@ -6,7 +6,9 @@ const { Shop, SubShelve, Shelve } = require("../models");
 
 const createSubShelve = async (req, res) => {
   try {
-    const { shopId, shelveId, name } = req.body;
+    const shopId = req.headers.shopid;
+    const shelveId = req.headers.shelveid;
+    const { name } = req.body;
 
     if (!shopId) {
       return res.status(400).json({
@@ -115,7 +117,10 @@ const createSubShelve = async (req, res) => {
 
 const updateSubShelveName = async (req, res) => {
   try {
-    const { shopId, shelveId, subShelveId, name } = req.body;
+    const subShelveId = req.headers.subshelveid;
+    const shopId = req.headers.shopid;
+    const shelveId = req.headers.shelveid;
+    const { name } = req.body;
 
     if (!shopId) {
       return res.status(400).json({
@@ -222,8 +227,8 @@ const updateSubShelveName = async (req, res) => {
 
 const getSubShelvesList = async (req, res) => {
   try {
-    const shopId = req.headers.shopid; // Récupérez shopId depuis l'en-tête
-    const shelveId = req.headers.shelveid; // Récupérez shelveId depuis l'en-tête
+    const shopId = req.headers.shopid;
+    const shelveId = req.headers.shelveid;
 
     if (!shopId) {
       return res.status(400).json({

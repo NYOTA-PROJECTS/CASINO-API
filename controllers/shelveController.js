@@ -130,7 +130,9 @@ const getShelvesList = async (req, res) => {
 
 const updateShelve = async (req, res) => {
   try {
-    const { name, shopId, shelveId } = req.body;
+    const shopId = req.headers.shopid;
+    const shelveId = req.params.shelveId;
+    const { name } = req.body;
     // Vérifiez si le rayon existe
     const existingShelve = await Shelve.findByPk(shelveId);
 
@@ -247,7 +249,7 @@ const updateShelveImage = async (req, res) => {
 
 const deleteShelve = async (req, res) => {
   try {
-    const shelveId = req.headers.shelveID;
+    const shelveId = req.headers.shelveid;
 
     // Vérifiez si le rayon existe
     const existingShelve = await Shelve.findByPk(shelveId);

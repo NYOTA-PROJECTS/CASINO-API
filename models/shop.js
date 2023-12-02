@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Shop.hasMany(models.Shelve, { foreignKey: 'shopId' });
       Shop.hasMany(models.Product, { foreignKey: 'shopId' });
       Shop.hasMany(models.Deliveryman, { foreignKey: 'shopId' });
+      Shop.hasMany(models.OrderPicker, { foreignKey: 'shopId' });
     }
   }
   Shop.init({

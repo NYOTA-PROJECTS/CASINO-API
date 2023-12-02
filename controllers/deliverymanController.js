@@ -103,8 +103,11 @@ const createDeliveryman = async (req, res) => {
 
 const listDeliverymen = async (req, res) => {
     try {
+        const shopId = req.headers.shopid;
+
         // Récupérer la liste de tous les livreurs
         const deliverymenList = await Deliveryman.findAll({
+            where: { shopId: shopId },
             attributes: ['id', 'name', 'phone', 'email'],
             order: [['name', 'ASC']],
         });
