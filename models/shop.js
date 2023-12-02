@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Shop.hasMany(models.Shelve, { foreignKey: 'shopId' });
       Shop.hasMany(models.Product, { foreignKey: 'shopId' });
+      Shop.hasMany(models.Deliveryman, { foreignKey: 'shopId' });
     }
   }
   Shop.init({

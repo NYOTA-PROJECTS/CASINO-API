@@ -11,9 +11,22 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Deliveryman.belongsTo(models.Shop, { foreignKey: 'shopId', onDelete: 'CASCADE' });
     }
   }
   Deliveryman.init({
+    shopId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Le magasin est obligatoire.',
+        },
+        notEmpty: {
+          msg: 'Le magasin est obligatoire.',
+        }
+      }
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -38,11 +51,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true
-      }
+      allowNull: true,
+      unique: true
     },
     password: {
       type: DataTypes.STRING,

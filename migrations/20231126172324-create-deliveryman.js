@@ -9,6 +9,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      shopId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Shops',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -21,7 +30,7 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
       },
       password: {

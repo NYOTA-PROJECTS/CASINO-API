@@ -40,9 +40,9 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 // Charger les certificats SSL
-/* const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/fullchain.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate }; */
+const credentials = { key: privateKey, cert: certificate };
 
 // Mogan logger
 app.use(morgan("combined"));
@@ -103,22 +103,21 @@ app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes, );
 app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes, );
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/product", createUploadsProductsFolder, productRoutes );
-app.use("/api/v1/deliverymen", deliverymanRoutes);
+app.use("/api/v1/deliveryman", deliverymanRoutes);
 
 
 // Créer le serveur HTTPS
-// const httpsServer = https.createServer(credentials, app);
- //const httpsServer = https.createServer(credentials, app);
+const httpsServer = https.createServer(credentials, app);
 
 // Démarrage serveur
-/* const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 httpsServer.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-}); */
+}); 
  
 
 // Démarrage serveur
- const PORT = process.env.PORT || 3000;
+/*  const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-}); 
+});  */

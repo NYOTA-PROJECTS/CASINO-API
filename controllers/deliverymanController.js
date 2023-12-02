@@ -1,9 +1,18 @@
 const bcrypt = require("bcrypt");
-const { Deliveryman } = require("../models");
+const { Deliveryman, Shop } = require("../models");
 
 const createDeliveryman = async (req, res) => {
   try {
+    const shopId = req.headers.shopid;
     const { name, phone, email, password } = req.body;
+
+
+    if (!shopId) {
+        return res.status(401).json({
+            status: "error",
+            message: "Identifiant de magasin non fourni.",
+        });
+    }
 
     if (!name) {
         return res.status(401).json({
@@ -18,14 +27,7 @@ const createDeliveryman = async (req, res) => {
             message: "Numéro de portable de livreur non fourni.",
         });
     }
-
-    if (!email) {
-        return res.status(401).json({
-            status: "error",
-            message: "Adresse e-mail de livreur non fournie.",
-        });
-    }
-
+    
     if (!password) {
         return res.status(401).json({
             status: "error",
@@ -40,11 +42,21 @@ const createDeliveryman = async (req, res) => {
         });
     }
 
+    // Vérifier si la boutique existe
+    const existingShop = await Shop.findByPk(shopId);
+    if (!existingShop) {
+        return res.status(404).json({
+            status: "error",
+            message: "Le magasin n'existe pas.",
+        });
+    }
+
     // Vérifier si le livreur existe déjà par son nom et son téléphone
     const existingDeliveryman = await Deliveryman.findOne({
       where: {
         name: name,
         phone: phone,
+        shopId: shopId,
       },
     });
 
@@ -63,11 +75,13 @@ const createDeliveryman = async (req, res) => {
       name: name,
       phone: phone,
       email: email,
+      shopId: shopId,
       password: hashedPassword,
     });
 
     const deliverymanResponse = {
       id: newDeliveryman.id,
+      shopId: newDeliveryman.shopId,
       name: newDeliveryman.name,
       phone: newDeliveryman.phone,
       email: newDeliveryman.email,
