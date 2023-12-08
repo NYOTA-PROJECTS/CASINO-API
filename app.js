@@ -100,8 +100,8 @@ const limiter = rateLimit({
 // Routes
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api/v1/shop", shopRoutes, );
-app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes, );
-app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes, );
+app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes );
+app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes );
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/product", createUploadsProductsFolder, productRoutes );
 app.use("/api/v1/deliveryman", deliverymanRoutes);
