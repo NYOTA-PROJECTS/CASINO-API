@@ -58,19 +58,6 @@ const createProduct = async (req, res) => {
       });
     }
 
-    // Vérifier si le nom du produit existe
-    const existingProductName = await Product.findOne({
-      where: {
-        name: name,
-      },
-    });
-
-    if (existingProductName) {
-      return res.status(409).json({
-        status: "error",
-        message: "Ce nom de produit existe déjà.",
-      });
-    }
 
     if (barcode.length < 8) {
       return res.status(400).json({
