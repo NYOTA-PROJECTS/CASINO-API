@@ -73,13 +73,6 @@ const createProduct = async (req, res) => {
       },
     });
 
-    if (existingBarcode) {
-      return res.status(409).json({
-        status: "error",
-        message: "Ce code-barres existeIntialized.",
-      });
-    }
-
     // Vérifier si le produit existe
     const existingProduct = await Product.findOne({
       where: {
@@ -141,6 +134,7 @@ const createProduct = async (req, res) => {
       subShelveId: newProduct.SubShelveId,
       name: newProduct.name,
       imageUrl: newProduct.imageUrl,
+      imageUrlLarge: newProduct.imageUrl,
       brcode: newProduct.barcode,
       price: newProduct.price,
       createdAt: newProduct.createdAt,
