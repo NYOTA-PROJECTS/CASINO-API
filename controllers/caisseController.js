@@ -181,7 +181,103 @@ const loginCaisse = async (req, res) => {
   }
 };
 
+const updatePassword = async (req, res) => {
+  try {
+    const { caisseId, password } = req.body;
+
+    if (!caisseId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir l'ID de la caissière.",
+      });
+    }
+
+    if (!password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le nouveau mot de passe.",
+      });
+    }
+
+    // Récupérer la caissière depuis la base de données
+    const caisse = await Caisse.findByPk(caisseId);
+
+    if (!caisse) {
+      return res.status(404).json({
+        status: "error",
+        message: "La caissière n'existe pas.",
+      });
+    }
+
+    // Vérifier si le nouveau mot de passe a une longueur minimale de 4 caractères
+    if (password.length < 4) {
+      return res.status(400).json({
+        status: "error",
+        message:
+          "Le nouveau mot de passe doit avoir une longueur minimale de 4 caractères.",
+      });
+    }
+
+    // Hacher le nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Mettre à jour le mot de passe dans la base de données
+    await caisse.update({ password: hashedPassword });
+
+    res.status(200).json({
+      status: "success",
+      message: "Mot de passe mis à jour avec succès.",
+    });
+  } catch (error) {
+    console.error(`ERROR UPDATE PASSWORD CAISSE: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message:
+        "Une erreur s'est produite lors de la mise à jour du mot de passe de la caissière.",
+    });
+  }
+};
+
+const deleteCaisse = async (req, res) => {
+  try {
+      const { caisseId } = req.headers.caisseid;
+
+      if (!caisseId) {
+          return res.status(400).json({
+              status: "error",
+              message: "Veuillez fournir l'ID de la caissière à supprimer.",
+          });
+      }
+
+      // Vérifier si la caissière existe
+      const caisse = await Caisse.findByPk(caisseId);
+
+      if (!caisse) {
+          return res.status(404).json({
+              status: "error",
+              message: "La caissière n'existe pas.",
+          });
+      }
+
+      // Supprimer la caissière de la base de données
+      await caisse.destroy();
+
+      res.status(200).json({
+          status: "success",
+          message: "Caissière supprimée avec succès.",
+      });
+  } catch (error) {
+      console.error(`ERROR DELETE CAISSE: ${error}`);
+      res.status(500).json({
+          status: "error",
+          message: "Une erreur s'est produite lors de la suppression de la caissière.",
+      });
+  }
+};
+
 module.exports = {
   createCaisse,
   loginCaisse,
+  updatePassword,
+  deleteCaisse,
 };
