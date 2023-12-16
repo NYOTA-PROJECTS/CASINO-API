@@ -88,7 +88,7 @@ const createDeliveryman = async (req, res) => {
       createdAt: newDeliveryman.createdAt,
     };
 
-    res.status(200).json({
+    res.status(201).json({
       status: "success",
       deliveryman: deliverymanResponse,
     });

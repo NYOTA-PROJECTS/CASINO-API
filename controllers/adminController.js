@@ -5,7 +5,6 @@ const { Admin } = require('../models');
 const login = async (req, res) => {
     const { email, password } = req.body;
     try {
-        console.log(email, password);
         const admin = await Admin.findOne({ where: { email } });
         if (!admin) {
             return res.status(409).json({
