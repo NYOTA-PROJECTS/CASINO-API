@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Caisse, Shop } = require("../models");
 
-// Creation de la caisse
 const createCaisse = async (req, res) => {
   try {
     const shopId = req.headers.shopid;
@@ -275,9 +274,49 @@ const deleteCaisse = async (req, res) => {
   }
 };
 
+const listCaissesByShop = async (req, res) => {
+  try {
+    const shopId = req.headers.shopid;
+
+    if (!shopId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir l'ID du magasin.",
+      });
+    }
+
+    // Vérifier si le magasin existe
+    const existingShop = await Shop.findByPk(shopId);
+    if (!existingShop) {
+      return res.status(404).json({
+        status: "error",
+        message: "Le magasin n'existe pas.",
+      });
+    }
+
+    // Récupérer la liste des caisses pour le magasin spécifié
+    const caisses = await Caisse.findAll({
+      where: { shopId },
+      attributes: ["id", "firstName", "lastName", "phone"],
+    });
+
+    res.status(200).json({
+      status: "success",
+      caisses,
+    });
+  } catch (error) {
+    console.error(`ERROR LIST CAISSES: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la récupération des caisses.",
+    });
+  }
+};
+
 module.exports = {
   createCaisse,
   loginCaisse,
   updatePassword,
   deleteCaisse,
+  listCaissesByShop,
 };

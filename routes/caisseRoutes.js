@@ -416,4 +416,93 @@ router.put("/update-password", adminTokenMiddleware, caisseController.updatePass
  */
 router.delete("/delete", adminTokenMiddleware, caisseController.deleteCaisse);
 
+/**
+ * @swagger
+ * /api/v1/caisse/list:
+ *   get:
+ *     summary: Liste des caisses par magasin
+ *     description: Récupère la liste des caisses avec leurs ID, prénoms, noms et numéros de téléphone correspondant à l'ID du magasin passé dans l'en-tête.
+ *     tags:
+ *       - Caisse
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer de l'administrateur.
+ *       - in: header
+ *         name: shopId
+ *         required: true
+ *         type: integer
+ *         description: Identifiant du magasin.
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie la liste des caisses avec leurs informations.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 caisses:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       firstName:
+ *                         type: string
+ *                         example: John
+ *                       lastName:
+ *                         type: string
+ *                         example: Doe
+ *                       phone:
+ *                         type: string
+ *                         example: 123456789
+ *       400:
+ *         description: Requête invalide - Vérifiez les paramètres de la requête.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Veuillez fournir l'ID du magasin.
+ *       404:
+ *         description: Non trouvé - Le magasin n'existe pas.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Le magasin n'existe pas.
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Une erreur s'est produite lors de la récupération des caisses.
+ */
+router.get("/list", adminTokenMiddleware, caisseController.listCaissesByShop);
+
 module.exports = router;
