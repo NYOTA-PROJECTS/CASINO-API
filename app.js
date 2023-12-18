@@ -15,6 +15,7 @@ const productRoutes = require("./routes/productRoutes");
 const deliverymanRoutes = require("./routes/deliverymanRoutes");
 const orderpickerRoutes = require("./routes/orderpickerRoutes");
 const caisseRoutes = require("./routes/caisseRoutes");
+const userRouters = require("./routes/userRoutes");
 const fs = require("fs");
 
 // Initialize express app
@@ -42,9 +43,9 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 // Charger les certificats SSL
-/* const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/fullchain.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate }; */
+const credentials = { key: privateKey, cert: certificate };
 
 // Mogan logger
 app.use(morgan("combined"));
@@ -53,6 +54,14 @@ app.use(morgan("combined"));
 dotenv.config();
 
 // Middleware to create the destination folder for public
+const createUploadsProfileFolder = (req, res, next) => {
+  const folderPath = "public/profiles";
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+  next();
+};
+
 const createUploadsShelvesFolder = (req, res, next) => {
   const folderPath = "public/uploads/shelves";
   if (!fs.existsSync(folderPath)) {
@@ -108,8 +117,9 @@ app.use("/api/v1/product", createUploadsProductsFolder, productRoutes );
 app.use("/api/v1/deliveryman", deliverymanRoutes);
 app.use("/api/v1/orderpicker", orderpickerRoutes);
 app.use("/api/v1/caisse", caisseRoutes);
+app.use("/api/v1/user", createUploadsProfileFolder, userRouters);
 
-/* 
+
 // Créer le serveur HTTPS
 const httpsServer = https.createServer(credentials, app);
 
@@ -117,11 +127,12 @@ const httpsServer = https.createServer(credentials, app);
 const PORT = process.env.PORT || 3000;
 httpsServer.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-}); */
+});
  
-
+/* 
 // Démarrage serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
 });
+ */
