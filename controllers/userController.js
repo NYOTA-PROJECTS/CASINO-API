@@ -6,8 +6,8 @@ const Sequelize = require("sequelize");
 const twilio = require("twilio");
 const { v4: uuidv4 } = require("uuid");
 const { User, Otp, Cashback, SponsoringWallet, SettingSponsoring } = require("../models");
-const accountSid = "ACa1159c8d1faa08ab522ea1705fa55f6f";
-const authToken = "5852ef5fa3b24c113b12f5c28542bbad";
+const accountSid = 'ACa1159c8d1faa08ab522ea1705fa55f6f';
+const authToken = 'de90c1334e51e3d3d32d88dd9e9b074b';
 const twilioClient = new twilio(accountSid, authToken);
 const fs = require("fs");
 const generatedSponsoringCode = require("../utils/sponsoringUtils");
@@ -101,9 +101,9 @@ async function sendOtpViaTwilio(phone, otp) {
     await twilioClient.messages.create({
       body: `Votre code de vérification est : ${otp}`,
       from: "+13023062887",
-      to: "+242066487546",
-    });
-    console.log(`OTP sent to ${phone}`);
+      to: "+242057465674",
+    }).then(call => console.log(`SMS RESPONSE: ${call.sid}`));;
+    console.log(`OTP sent to 044913233`);
   } catch (error) {
     console.error(`ERROR SENDING OTP VIA TWILIO: ${error}`);
     throw error;
