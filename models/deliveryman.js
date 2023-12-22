@@ -18,41 +18,19 @@ module.exports = (sequelize, DataTypes) => {
     shopId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Le magasin est obligatoire.',
-        },
-        notEmpty: {
-          msg: 'Le magasin est obligatoire.',
-        }
-      }
     },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
-      validate: {
-        len: {
-          args: [3],
-          msg: 'Le nom du livreur doit avoir au moins 3 caractères.',
-        },
-      }
     },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        len: {
-          args: [9],
-          msg: 'Le numéro de téléphone doit avoir au moins 9 caractères.',
-        },
-      }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true
     },
     password: {
       type: DataTypes.STRING,

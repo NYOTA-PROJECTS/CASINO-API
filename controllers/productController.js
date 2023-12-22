@@ -58,7 +58,6 @@ const createProduct = async (req, res) => {
       });
     }
 
-
     if (barcode.length < 8) {
       return res.status(400).json({
         status: "error",
@@ -318,9 +317,13 @@ const listProducts = async (req, res) => {
     const subShelveId = req.headers.subshelveid;
 
     const shop = await Shop.findByPk(shopId);
-    console.log(`ID SHOP: ${shopId}, ID SHELVE: ${shelveId}, ID SUBSHELVE: ${subShelveId}`);
     if (!shop) {
-      return res.status(404).json({ status: "error", message: "Aucun produit trouvé pour cette boutique" });
+      return res
+        .status(404)
+        .json({
+          status: "error",
+          message: "Aucun produit trouvé pour cette boutique",
+        });
     }
 
     const shelve = await Shelve.findOne({
@@ -331,7 +334,9 @@ const listProducts = async (req, res) => {
     });
 
     if (!shelve) {
-      return res.status(404).json({ status: "error", message: "Aucun produit dans ce rayon" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Aucun produit dans ce rayon" });
     }
 
     const subShelve = await SubShelve.findOne({
@@ -343,7 +348,9 @@ const listProducts = async (req, res) => {
     });
 
     if (!subShelve) {
-      return res.status(404).json({ status: "error", message: "Aucun produit dans ce sous-rayon" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Aucun produit dans ce sous-rayon" });
     }
 
     const products = await Product.findAll({
@@ -352,13 +359,24 @@ const listProducts = async (req, res) => {
         shelveId: shelveId,
         subShelveId: subShelveId,
       },
-      attributes: ['id', 'name', 'imageUrl', 'brcode', 'price'],
-      order: [['name', 'ASC']],
+      attributes: ["id", "name", "imageUrl", "brcode", "price"],
+      order: [["name", "ASC"]],
     });
+
+    const productsResponse = products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      brcode: product.brcode,
+      price: product.price,
+      shopId: shopId,
+      shelveId: shelveId,
+      subShelveId: subShelveId,
+    }));
 
     res.status(200).json({
       status: "success",
-      products: products,
+      products: productsResponse,
     });
   } catch (error) {
     console.error(`ERROR LISTING PRODUCTS: ${error}`);

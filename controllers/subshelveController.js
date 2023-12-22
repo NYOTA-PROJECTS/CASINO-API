@@ -31,7 +31,6 @@ const createSubShelve = async (req, res) => {
       });
     }
 
-
     // Vérifier si la boutique  existe
     const existingShop = await Shop.findByPk(shopId);
 
@@ -234,14 +233,14 @@ const getSubShelvesList = async (req, res) => {
       return res.status(400).json({
         status: "error",
         message: "ID de la boutique manquant.",
-      })
+      });
     }
 
     if (!shelveId) {
       return res.status(400).json({
         status: "error",
         message: "ID du rayon manquant.",
-      })
+      });
     }
 
     // Vérifiez si la boutique, le rayon existent
@@ -270,18 +269,17 @@ const getSubShelvesList = async (req, res) => {
     // Formatez les données pour la réponse
     const listeSousRayons = sousRayons.map((sousRayon) => ({
       id: sousRayon.id,
-      idBoutique: sousRayon.shopId,
-      idRayon: sousRayon.shelveId,
-      nom: sousRayon.name,
-      image: sousRayon.imageUrl,
+      shopId: sousRayon.shopId,
+      shelveId: sousRayon.shelveId,
+      name: sousRayon.name,
+      imageUrl: sousRayon.imageUrl,
       createdAt: sousRayon.createdAt,
-    }));
+    }),);
 
     res.status(200).json({
       status: "success",
       subShelves: listeSousRayons,
     });
-
   } catch (error) {
     console.error(`ERROR GETTING SUBSHELVES LIST: ${error}`);
     res.status(500).json({
