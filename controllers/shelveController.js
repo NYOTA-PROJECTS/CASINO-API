@@ -130,9 +130,7 @@ const getShelvesList = async (req, res) => {
 
 const updateShelve = async (req, res) => {
   try {
-    const shopId = req.headers.shopid;
-    const shelveId = req.params.shelveId;
-    const { name } = req.body;
+    const { name, shopId, shelveId } = req.body;
     // Vérifiez si le rayon existe
     const existingShelve = await Shelve.findByPk(shelveId);
 
@@ -188,15 +186,23 @@ const updateShelve = async (req, res) => {
 
 const updateShelveImage = async (req, res) => {
   try {
-    const { shelveId } = req.body;
+    const { shelveId, shopId } = req.body;
 
     // Vérifiez si le rayon existe
     const existingShelve = await Shelve.findByPk(shelveId);
+    const existingShop = await Shop.findByPk(shopId);
 
     if (!existingShelve) {
       return res.status(404).json({
         status: "error",
         message: "Rayon non trouvé.",
+      });
+    }
+
+    if (!existingShop) {
+      return res.status(404).json({
+        status: "error",
+        message: "Boutique non trouvé.",
       });
     }
 
@@ -216,7 +222,7 @@ const updateShelveImage = async (req, res) => {
       `resized_${req.file.filename}`
     );
 
-    await sharp(req.file.path).resize(250, 250).toFile(resizedImagePath);
+    await sharp(req.file.path).resize(350, 350).toFile(resizedImagePath);
 
     const newImageUrl = `${req.protocol}://${req.get(
       "host"
@@ -225,6 +231,10 @@ const updateShelveImage = async (req, res) => {
     // Mise à jour de l'image du rayon
     const updatedShelve = await existingShelve.update({
       imageUrl: newImageUrl,
+      where: {
+        id: shelveId,
+        shopId: shopId,
+      }
     });
 
     const shelveResponse = {
