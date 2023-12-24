@@ -11,11 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Shop.hasMany(models.Shelve, { foreignKey: 'shopId' });
-      Shop.hasMany(models.Product, { foreignKey: 'shopId' });
-      Shop.hasMany(models.Deliveryman, { foreignKey: 'shopId' });
-      Shop.hasMany(models.OrderPicker, { foreignKey: 'shopId' });
-      Shop.hasMany(models.Caisse, { foreignKey: 'shopId' });
+      this.hasMany(models.Shelve, { foreignKey: 'shopId' });
+      this.hasMany(models.Product, { foreignKey: 'shopId' });
+      this.hasMany(models.Deliveryman, { foreignKey: 'shopId' });
+      this.hasMany(models.OrderPicker, { foreignKey: 'shopId' });
+      this.hasMany(models.Caisse, { foreignKey: 'shopId' });
+      this.hasMany(models.Promotion, { foreignKey: 'shopId' });
     }
   }
   Shop.init({

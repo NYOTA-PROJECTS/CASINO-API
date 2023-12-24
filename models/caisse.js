@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Caisse.belongsTo(models.Shop, { foreignKey: 'shopId', onDelete: 'CASCADE' });
+      this.belongsTo(models.Shop, { foreignKey: 'shopId', onDelete: 'CASCADE' });
     }
   }
   Caisse.init({
