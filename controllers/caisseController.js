@@ -316,7 +316,6 @@ const listCaissesByShop = async (req, res) => {
 const clientInfos = async (req, res) => {
   try {
     const { barcode } =  req.body;
-
     if (!barcode) {
       return res.status(400).json({
         status: "error",

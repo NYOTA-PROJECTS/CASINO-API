@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
-const https = require("https");
+const https = require('https');
 const shopRoutes = require("./routes/shopRoutes");
 const shelveRoutes = require("./routes/shelveRoutes");
 const subshelveRoutes = require("./routes/subshelveRoutes");
@@ -17,6 +17,8 @@ const orderpickerRoutes = require("./routes/orderpickerRoutes");
 const caisseRoutes = require("./routes/caisseRoutes");
 const userRouters = require("./routes/userRoutes");
 const promotionRouters = require("./routes/promotionRoutes");
+const sponsoringRouters = require("./routes/sponsoringRoutes");
+const settingRouters = require("./routes/settingRoute");
 const fs = require("fs");
 
 // Initialize express app
@@ -47,7 +49,7 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/nyota-apps.com/fullchain.pem', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
- 
+
 // Mogan logger
 app.use(morgan("combined"));
 
@@ -95,6 +97,7 @@ const createUploadsPromotionsFolder = (req, res, next) => {
   next();
 };
 
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -118,16 +121,19 @@ const limiter = rateLimit({
 
 // Routes
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use("/api/v1/shop", shopRoutes);
-app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes);
-app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes);
+app.use("/api/v1/shop", shopRoutes, );
+app.use("/api/v1/shelve", createUploadsShelvesFolder, shelveRoutes );
+app.use("/api/v1/subshelve", createUploadsSubShelvesFolder, subshelveRoutes );
 app.use("/api/v1/admin", adminRoutes);
-app.use("/api/v1/product", createUploadsProductsFolder, productRoutes);
+app.use("/api/v1/product", createUploadsProductsFolder, productRoutes );
 app.use("/api/v1/deliveryman", deliverymanRoutes);
 app.use("/api/v1/orderpicker", orderpickerRoutes);
 app.use("/api/v1/caisse", caisseRoutes);
 app.use("/api/v1/user", createUploadsProfileFolder, userRouters);
 app.use("/api/v1/promotion", createUploadsPromotionsFolder, promotionRouters);
+app.use("/api/v1/referral", sponsoringRouters);
+app.use("/api/v1/setting", settingRouters);
+
 
 // Créer le serveur HTTPS
 const httpsServer = https.createServer(credentials, app);
@@ -137,10 +143,9 @@ const PORT = process.env.PORT || 3000;
 httpsServer.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
 });
-
+ 
 /* // Démarrage serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀🚀---- API CASINO RUNNING ----🚀🚀`);
-});
- */
+}); */

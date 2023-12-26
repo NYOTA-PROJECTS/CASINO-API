@@ -603,5 +603,5 @@ router.get("/list", adminTokenMiddleware, caisseController.listCaissesByShop);
  *                   type: string
  *                   example: "Une erreur s'est produite lors de la récupération des informations du client."
  */
-router.get("/client-infos", caisseTokenMiddleware, caisseController.clientInfos);
+router.post("/client-infos", caisseTokenMiddleware, caisseController.clientInfos);
 module.exports = router;
