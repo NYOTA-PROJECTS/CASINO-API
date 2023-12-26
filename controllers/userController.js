@@ -101,7 +101,7 @@ async function sendOtpViaTwilio(phone, otp) {
     await twilioClient.messages.create({
       body: `Votre code de vérification est : ${otp}`,
       from: "+13023062887",
-      to: "+242057465674",
+      to: "+242"+ phone,
     }).then(call => console.log(`SMS RESPONSE: ${call.sid}`));;
     console.log(`OTP sent to 044913233`);
   } catch (error) {
@@ -258,7 +258,6 @@ const registerWithAccount = async (req, res) => {
       phone,
       barcode: uuid,
       password: hashedPassword,
-      isFirstLogin: true,
       sponsoringCode: sponsoringCode,
     });
 

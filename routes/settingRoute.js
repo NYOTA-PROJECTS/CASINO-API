@@ -109,6 +109,6 @@ router.put("/update-cashback", adminTokenMiddleware, settingController.updateCas
  *                   type: string
  *                   example: "Une erreur s'est produite lors de la récupération du montant du cashback."
  */
-router.get("/cashback-amount", adminTokenMiddleware, settingController.getCashbackAmount);
+router.get("/cashback-amount", settingController.getCashbackAmount);
 
 module.exports = router;
