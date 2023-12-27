@@ -164,6 +164,7 @@ const loginCaisse = async (req, res) => {
     const cashbackAmount = setting ? setting.cashbackAmount : 0;
 
     const caisseResponse = {
+      id: existingCaisse.id,
       shopName: existingCaisse.Shop.name,
       firstName: existingCaisse.firstName,
       lastName: existingCaisse.lastName,
