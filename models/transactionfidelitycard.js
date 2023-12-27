@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     ticketAmount: {
-      type: DataTypes.DOUBLE.DOUBLE(20, 2),
+      type: DataTypes.DOUBLE(20, 2),
       allowNull: false
     },
     ticketCashback: {
