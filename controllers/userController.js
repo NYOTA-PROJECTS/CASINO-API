@@ -5,9 +5,15 @@ const jwt = require("jsonwebtoken");
 const Sequelize = require("sequelize");
 const twilio = require("twilio");
 const { v4: uuidv4 } = require("uuid");
-const { User, Otp, Cashback, SponsoringWallet, SettingSponsoring } = require("../models");
-const accountSid = 'ACa1159c8d1faa08ab522ea1705fa55f6f';
-const authToken = 'de90c1334e51e3d3d32d88dd9e9b074b';
+const {
+  User,
+  Otp,
+  Cashback,
+  SponsoringWallet,
+  SettingSponsoring,
+} = require("../models");
+const accountSid = "ACa1159c8d1faa08ab522ea1705fa55f6f";
+const authToken = "de90c1334e51e3d3d32d88dd9e9b074b";
 const twilioClient = new twilio(accountSid, authToken);
 const fs = require("fs");
 const generatedSponsoringCode = require("../utils/sponsoringUtils");
@@ -98,11 +104,13 @@ const userCheck = async (req, res) => {
 // Fonction pour envoyer l'OTP via Twilio
 async function sendOtpViaTwilio(phone, otp) {
   try {
-    await twilioClient.messages.create({
-      body: `Votre code de vérification est : ${otp}`,
-      from: "+13023062887",
-      to: "+242"+ phone,
-    }).then(call => console.log(`SMS RESPONSE: ${call.sid}`));;
+    await twilioClient.messages
+      .create({
+        body: `Votre code de vérification est : ${otp}`,
+        from: "+13023062887",
+        to: "+242" + phone,
+      })
+      .then((call) => console.log(`SMS RESPONSE: ${call.sid}`));
     console.log(`OTP sent to 044913233`);
   } catch (error) {
     console.error(`ERROR SENDING OTP VIA TWILIO: ${error}`);
@@ -207,7 +215,6 @@ const registerWithAccount = async (req, res) => {
       });
     }
 
-
     if (!amount) {
       return res.status(400).json({
         status: "error",
@@ -250,7 +257,7 @@ const registerWithAccount = async (req, res) => {
       lastName,
       birthday,
       phone,
-      barcode: uuid,
+      barcode: uuidv4(),
       password: hashedPassword,
       sponsoringCode: sponsoringCode,
     });
@@ -370,8 +377,15 @@ const updateProfileImage = async (req, res) => {
 
 const registerWithoutAccount = async (req, res) => {
   try {
-    const { phone, firstName, lastName, birthday, sponsorCode, password } =
-      req.body;
+    const {
+      phone,
+      firstName,
+      lastName,
+      birthday,
+      sponsorCode,
+      isWhatsapp,
+      password,
+    } = req.body;
 
     if (!firstName) {
       return res.status(400).json({
@@ -461,20 +475,20 @@ const registerWithoutAccount = async (req, res) => {
 
     let sponsorId = null;
 
-if (sponsorCode) {
-  const sponsor = await User.findOne({
-    where: { sponsoringCode: sponsorCode },
-  });
+    if (sponsorCode) {
+      const sponsor = await User.findOne({
+        where: { sponsoringCode: sponsorCode },
+      });
 
-  if (!sponsor) {
-    return res.status(400).json({
-      status: "error",
-      message: "Le code de parrainage est incorrect.",
-    });
-  }
+      if (!sponsor) {
+        return res.status(400).json({
+          status: "error",
+          message: "Le code de parrainage est incorrect.",
+        });
+      }
 
-  sponsorId = sponsor.id;
-}
+      sponsorId = sponsor.id;
+    }
 
     // Création d'un nouveau code de parrainage s'il n'est pas fourni
     const mySponsorCode = generatedSponsoringCode.generateSponsoringCode();
@@ -482,14 +496,15 @@ if (sponsorCode) {
 
     // Création de l'utilisateur
     const user = await User.create({
-      phone,
-      firstName,
-      lastName,
-      birthday,
+      phone: phone,
+      firstName: firstName,
+      lastName: lastName,
       password: hashedpassword,
+      barcode: uuidv4(),
+      isWhatsapp: isWhatsapp === null ? false : isWhatsapp,
+      birthday: birthday,
       sponsorId: sponsorId,
       sponsoringCode: mySponsorCode,
-      barcode: uuid,
     });
 
     if (sponsorCode) {
@@ -517,6 +532,7 @@ if (sponsorCode) {
       phone: user.phone,
       sponsorId: user.sponsorId,
       barcode: user.barcode,
+      isWhatsapp: user.isWhatsapp,
       token: token,
     };
 
@@ -605,25 +621,36 @@ const login = async (req, res) => {
         message: "Le mot de passe doit contenir au moins 6 caractères.",
       });
     }
-    
+
     // Vérifiez si l'utilisateur existe dans la base de données en utilisant le numéro de téléphone
     const user = await User.findOne({ where: { phone } });
     if (!user) {
       // Si l'utilisateur n'existe pas, demandez de créer un compte
-      return res.status(401).json({ status: 'error', message: 'Numéro de téléphone non enregistré. Veuillez créer un compte.', });
+      return res
+        .status(401)
+        .json({
+          status: "error",
+          message:
+            "Numéro de téléphone non enregistré. Veuillez créer un compte.",
+        });
     }
 
     // Vérifiez si le mot de passe est valide
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ status: 'error', message: 'Numéro de téléphone ou mot de passe incorrect.', });
+      return res
+        .status(401)
+        .json({
+          status: "error",
+          message: "Numéro de téléphone ou mot de passe incorrect.",
+        });
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
 
     const userCashback = await Cashback.findOne({
       where: { userId: user.id },
-    })
+    });
 
     const cashbackAmount = userCashback.amount;
 
@@ -642,17 +669,15 @@ const login = async (req, res) => {
     res.status(200).json({
       status: "success",
       user: userResponse,
-    })
-    
+    });
   } catch (error) {
     console.error(`Error login: ${error}`);
     res.status(500).json({
       status: "error",
-      message:
-        "Une erreur s'est produite lors de la connexion.",
+      message: "Une erreur s'est produite lors de la connexion.",
     });
   }
-}
+};
 
 module.exports = {
   userCheck,
@@ -661,5 +686,5 @@ module.exports = {
   registerWithAccount,
   updateProfileImage,
   checkCode,
-  login
+  login,
 };

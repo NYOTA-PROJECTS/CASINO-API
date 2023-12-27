@@ -20,7 +20,9 @@ module.exports = {
         references: {
           model: 'Users',
           key: 'id',
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       sponsoringCode: {
         type: Sequelize.STRING,
@@ -37,6 +39,7 @@ module.exports = {
       },
       imageUrl: {
         type: Sequelize.STRING,
+        unique: false,
         allowNull: true
       },
       phone: {

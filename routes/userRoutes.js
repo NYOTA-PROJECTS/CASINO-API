@@ -510,11 +510,7 @@ router.post("/register-with-account", userController.registerWithAccount);
  *                   type: string
  *                   example: Une erreur est survenue lors de la mise à jour de l'image de profil.
  */
-router.put(
-  "/update-profile-image",
-  upload.single("profileImage"),
-  userController.updateProfileImage
-);
+router.put("/update-profile-image", upload.single("profileImage"), userController.updateProfileImage);
 
 /**
  * @swagger
