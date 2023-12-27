@@ -706,6 +706,9 @@ router.post("/client-infos", caisseTokenMiddleware, caisseController.clientInfos
  *                   type: string
  *                   example: "Une erreur s'est produite lors de la récupération des informations du client."
  */
-router.post("/client-infos-voucher", caisseController.clientInfosVoucher);
+router.post("/client-infos-voucher", caisseTokenMiddleware, caisseController.clientInfosVoucher);
+
+router.post("/validate-ticket", caisseTokenMiddleware, caisseController.validateTicket);
+
 
 module.exports = router;

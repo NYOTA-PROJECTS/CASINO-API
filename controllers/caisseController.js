@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, Caisse, Shop, Voucher } = require("../models");
+const { User, Caisse, Shop, Voucher, TransactionFidelityCard } = require("../models");
 
 const createCaisse = async (req, res) => {
   try {
@@ -391,7 +391,6 @@ const clientInfosVoucher = async (req, res) => {
       });
     }
 
-
     const clientResponse = {
       id: client.id,
       barcode: client.barcode,
@@ -416,6 +415,103 @@ const clientInfosVoucher = async (req, res) => {
   }
 }
 
+const validateTicket = async (req, res) => {
+  try {
+    const { caisseId, userId, paymentType, date, number, amount, cashback } = req.body;
+
+    if (!caisseId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir l'ID de la caisse.",
+      });  
+    }
+
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir l'ID de l'utilisateur.",
+      });  
+    }
+
+    if (!paymentType) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le type de paiement.",
+      });  
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir la date de la validation.",
+      });  
+    }
+
+    if (!number) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le numéro du ticket.",
+      });
+    }
+
+    if (!amount) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le montant du ticket.",
+      });
+    }
+
+    if (!cashback) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le montant du cashback.",
+      });
+    }
+
+    const caisse = await Caisse.findOne({ where: { id: caisseId } });
+
+    if (!caisse) {
+      return res.status(404).json({
+        status: "error",
+        message: "La caisse n'existe pas.",
+      });
+    }
+
+    const user = await User.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "L'utilisateur n'existe pas.",
+      });
+    }
+
+    const transaction = await TransactionFidelityCard.create({
+      userId,
+      caisseId,
+      paymentType: 1,
+      ticketDate: date,
+      ticketNumber: number,
+      ticketAmount: amount,
+      ticketCashback: cashback,
+      state: 1
+    });
+
+    res.status(201).json({
+      status: "success",
+      message: "La validation de la commande a été effectuée avec succès.",
+      transaction: transaction
+    });
+
+  } catch (error) {
+    console.error(`ERROR VALIDATION DE TICKET: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la validation du ticket de l'utilisateur.",
+    });
+  }
+}
+
 module.exports = {
   createCaisse,
   loginCaisse,
@@ -423,5 +519,6 @@ module.exports = {
   deleteCaisse,
   listCaissesByShop,
   clientInfos,
-  clientInfosVoucher
+  clientInfosVoucher,
+  validateTicket
 };
