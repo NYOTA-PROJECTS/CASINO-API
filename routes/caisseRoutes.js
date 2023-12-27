@@ -710,5 +710,6 @@ router.post("/client-infos-voucher", caisseTokenMiddleware, caisseController.cli
 
 router.post("/validate-ticket", caisseTokenMiddleware, caisseController.validateTicket);
 
+router.put("/validate-voucher", caisseTokenMiddleware, caisseController.validateVoucher);
 
 module.exports = router;

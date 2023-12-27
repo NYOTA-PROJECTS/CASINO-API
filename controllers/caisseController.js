@@ -512,6 +512,105 @@ const validateTicket = async (req, res) => {
   }
 }
 
+const validateVoucher = async (req, res) => {
+  try {
+    const { caisseId, userId, date, number, amount, cashback } = req.body;
+
+    if (!caisseId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir l'ID de la caisse.",
+      });  
+    }
+
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir l'ID de l'utilisateur.",
+      });  
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir la date de la validation.",
+      });  
+    }
+
+    if (!number) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le numéro du ticket.",
+      });
+    }
+
+    if (!amount) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le montant du ticket.",
+      });
+    }
+
+    if (!cashback) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez fournir le montant du cashback.",
+      });
+    }
+
+    const caisse = await Caisse.findOne({ where: { id: caisseId } });
+
+    if (!caisse) {
+      return res.status(404).json({
+        status: "error",
+        message: "La caisse n'existe pas.",
+      });
+    }
+
+    const user = await User.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "L'utilisateur n'existe pas.",
+      });
+    }
+
+    const voucher = await Voucher.update(
+      {
+        caisseId: caisseId,
+        ticketDate: date,
+        ticketNumber: number,
+        ticketAmount: amount,
+        ticketCashback: cashback,
+        state: 2
+      },
+      {
+        where: { userId: userId },
+      }
+    );
+
+    if (voucher && voucher[0] === 1) {
+      res.status(200).json({
+        status: "success",
+        message: "Le bon d'achat a été validé avec succès.",
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        message: "Une erreur s'est produite lors de la validation du bon d'achat.",
+      });
+    }
+
+  } catch (error) {
+    console.error(`ERROR VALIDATION DE BON D'ACHAT: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la validation du bon d'achat.",
+    });
+  }
+}
+
 module.exports = {
   createCaisse,
   loginCaisse,
@@ -520,5 +619,6 @@ module.exports = {
   listCaissesByShop,
   clientInfos,
   clientInfosVoucher,
-  validateTicket
+  validateTicket,
+  validateVoucher
 };
