@@ -604,4 +604,108 @@ router.get("/list", adminTokenMiddleware, caisseController.listCaissesByShop);
  *                   example: "Une erreur s'est produite lors de la récupération des informations du client."
  */
 router.post("/client-infos", caisseTokenMiddleware, caisseController.clientInfos);
+
+/**
+ * @swagger
+ * /api/v1/caisse/client-infos-voucher:
+ *   get:
+ *     summary: Récupération des informations du client et le mantant du bon d'achat par scan du QR code.
+ *     description: |
+ *       Récupère les informations du client en scannant le QR code de sa carte de fidélité et le mantant du bon d'achat. Retourne les détails du client si la carte existe et est active.
+ *     tags:
+ *       - Caisse
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer de la caisse.
+ *       - in: body
+ *         name: barcode
+ *         description: Données de récupération des informations du client
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             barcode:
+ *               type: string
+ *               description: QR code du client
+ *               example: "abcdef123456"
+ *     responses:
+ *       200:
+ *         description: Succès - Informations du client récupérées avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 client:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     barcode:
+ *                       type: string
+ *                       example: "abcdef123456"
+ *                     firstName:
+ *                       type: string
+ *                       example: John
+ *                     lastName:
+ *                       type: string
+ *                       example: Doe
+ *                     phone:
+ *                       type: string
+ *                       example: "123456789"
+ *                     imageUrl:
+ *                       type: string
+ *                       example: "https://example.com/profile.jpg"
+ *                     amount:
+ *                       type: double
+ *                       example: "12349"
+ *       400:
+ *         description: Requête invalide - Veuillez vérifier les paramètres de la requête.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Veuillez scanner le QR du client."
+ *       404:
+ *         description: Non trouvé - La carte de fidélité n'existe pas ou n'est pas valide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Cette carte de fidélité n'existe pas, veuillez scanner une autre carte ou réessayer à nouveau."
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la récupération des informations du client."
+ */
+router.post("/client-infos-voucher", caisseController.clientInfosVoucher);
+
 module.exports = router;

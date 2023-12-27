@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, Caisse, Shop } = require("../models");
+const { User, Caisse, Shop, Voucher } = require("../models");
 
 const createCaisse = async (req, res) => {
   try {
@@ -358,6 +358,64 @@ const clientInfos = async (req, res) => {
   }
 }
 
+const clientInfosVoucher = async (req, res) => {
+  try {
+    const { barcode } =  req.body;
+    if (!barcode) {
+      return res.status(400).json({
+        status: "error",
+        message: "Veuillez scanner le QR du client.",
+      });
+    }
+
+    const client = await User.findOne({
+      where: { barcode },
+      attributes: ["id", "barcode", "firstName", "lastName", "phone", "imageUrl"],
+    });
+
+    if (!client) {
+      return res.status(404).json({
+        status: "error",
+        message: "Cette carte de fidelité n'existe pas, veuillez scanner une autre carte ou réessayer à nouveau.",
+      });
+    }
+
+    const clientVoucher = await Voucher.findOne({
+      where: { userId: client.id },
+    }) 
+
+    if (!clientVoucher) {
+      return res.status(404).json({
+        status: "error",
+        message: "Le client n'a pas de bon d'achat.",
+      });
+    }
+
+
+    const clientResponse = {
+      id: client.id,
+      barcode: client.barcode,
+      firstName: client.firstName,
+      lastName: client.lastName,
+      phone: client.phone,
+      imageUrl: client.imageUrl,
+      amount: clientVoucher.amount || 0
+    };
+    
+    res.status(200).json({
+      status: "success",
+      client: clientResponse,
+    })
+    
+  } catch (error) {
+    console.error(`ERROR RECUPERATION INFOS CLIENT: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la création de la caisse.",
+    });
+  }
+}
+
 module.exports = {
   createCaisse,
   loginCaisse,
@@ -365,4 +423,5 @@ module.exports = {
   deleteCaisse,
   listCaissesByShop,
   clientInfos,
+  clientInfosVoucher
 };
