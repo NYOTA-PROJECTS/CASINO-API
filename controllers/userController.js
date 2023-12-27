@@ -664,7 +664,7 @@ const login = async (req, res) => {
   }
 };
 
-const listUsers = async (req, res) => {
+const list = async (req, res) => {
   try {
     const users = await User.findAll();
 
@@ -702,5 +702,5 @@ module.exports = {
   updateProfileImage,
   checkCode,
   login,
-  listUsers,
+  list,
 };

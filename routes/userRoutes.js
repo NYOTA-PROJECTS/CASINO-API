@@ -99,7 +99,7 @@ const upload = multer({
  *                   type: string
  *                   example: "Une erreur s'est produite lors de la récupération de tous les utilisateurs."
  */
-router.get("/list-all", adminTokenMiddleware, userController.listUsers);
+router.get("/list-all", adminTokenMiddleware, userController.list);
 
 /**
  * @swagger
