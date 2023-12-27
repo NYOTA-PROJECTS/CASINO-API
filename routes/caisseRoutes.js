@@ -508,7 +508,7 @@ router.get("/list", adminTokenMiddleware, caisseController.listCaissesByShop);
 /**
  * @swagger
  * /api/v1/caisse/client-infos:
- *   get:
+ *   post:
  *     summary: Récupération des informations du client par scan du QR code.
  *     description: |
  *       Récupère les informations du client en scannant le QR code de sa carte de fidélité. Retourne les détails du client si la carte existe et est active.
@@ -608,7 +608,7 @@ router.post("/client-infos", caisseTokenMiddleware, caisseController.clientInfos
 /**
  * @swagger
  * /api/v1/caisse/client-infos-voucher:
- *   get:
+ *   post:
  *     summary: Récupération des informations du client et le mantant du bon d'achat par scan du QR code.
  *     description: |
  *       Récupère les informations du client en scannant le QR code de sa carte de fidélité et le mantant du bon d'achat. Retourne les détails du client si la carte existe et est active.

@@ -17,7 +17,6 @@ const authToken = "de90c1334e51e3d3d32d88dd9e9b074b";
 const twilioClient = new twilio(accountSid, authToken);
 const fs = require("fs");
 const generatedSponsoringCode = require("../utils/sponsoringUtils");
-const uuid = uuidv4();
 
 const userCheck = async (req, res) => {
   try {
@@ -54,10 +53,7 @@ const userCheck = async (req, res) => {
       `SELECT c.first_name, c.last_name, ca.montant
            FROM clients c
            INNER JOIN cartes ca ON c.id = ca.client_id
-           WHERE c.phone = :phone
-             AND ca.mois = 12
-             AND ca.annee = 2023
-           LIMIT 1`,
+           WHERE c.phone = :phone LIMIT 1`,
       {
         replacements: { phone },
         type: Sequelize.QueryTypes.SELECT,
@@ -66,13 +62,13 @@ const userCheck = async (req, res) => {
 
     if (results) {
       // Générer les codes
-      const otpSms = generateOtp();
+      //const otpSms = generateOtp();
 
       // Envoyer les codes via Twilio
-      await sendOtpViaTwilio(phone, otpSms);
+      //await sendOtpViaTwilio(phone, otpSms);
 
       // Stocker les codes dans la base de données
-      await storeOtpsInDatabase(phone, otpSms);
+      //await storeOtpsInDatabase(phone, otpSms);
 
       const userResponse = {
         firstName: results.first_name,
@@ -88,7 +84,7 @@ const userCheck = async (req, res) => {
       return res.status(404).json({
         status: "error",
         message:
-          "Ce numéro de portable n'est affilié à aucune carte de fidélité. Veuillez vous inscrire en indiquant ne pas avoir de carte.",
+          "Cette carte de fidélité n'est plus valide. Veuillez vous inscrire en indiquant ne pas avoir de carte.",
       });
     }
   } catch (error) {
@@ -215,13 +211,6 @@ const registerWithAccount = async (req, res) => {
       });
     }
 
-    if (!amount) {
-      return res.status(400).json({
-        status: "error",
-        message: "Veuillez fournir le montant.",
-      });
-    }
-
     if (!password) {
       return res.status(400).json({
         status: "error",
@@ -255,7 +244,7 @@ const registerWithAccount = async (req, res) => {
     const newUser = await User.create({
       firstName,
       lastName,
-      birthday,
+      birthday: birthday || null,
       phone,
       barcode: uuidv4(),
       password: hashedPassword,
@@ -264,7 +253,7 @@ const registerWithAccount = async (req, res) => {
 
     const cashback = await Cashback.create({
       userId: newUser.id,
-      amount: amount,
+      amount: amount || 0,
     });
 
     await SponsoringWallet.create({
@@ -455,10 +444,7 @@ const registerWithoutAccount = async (req, res) => {
       `SELECT c.first_name, c.last_name, ca.montant
        FROM clients c
        INNER JOIN cartes ca ON c.id = ca.client_id
-       WHERE c.phone = :phone
-         AND ca.mois = 12
-         AND ca.annee = 2023
-       LIMIT 1`,
+       WHERE c.phone = :phone LIMIT 1`,
       {
         replacements: { phone },
         type: Sequelize.QueryTypes.SELECT,
@@ -489,7 +475,6 @@ const registerWithoutAccount = async (req, res) => {
 
       sponsorId = sponsor.id;
     }
-
     // Création d'un nouveau code de parrainage s'il n'est pas fourni
     const mySponsorCode = generatedSponsoringCode.generateSponsoringCode();
     const hashedpassword = await bcrypt.hash(password, 10);
@@ -502,7 +487,7 @@ const registerWithoutAccount = async (req, res) => {
       password: hashedpassword,
       barcode: uuidv4(),
       isWhatsapp: isWhatsapp === null ? false : isWhatsapp,
-      birthday: birthday,
+      birthday: birthday || null,
       sponsorId: sponsorId,
       sponsoringCode: mySponsorCode,
     });

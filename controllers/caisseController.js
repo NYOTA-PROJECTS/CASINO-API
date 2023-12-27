@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, Caisse, Shop, Voucher, TransactionFidelityCard } = require("../models");
+const { User, Caisse, Shop, Voucher, TransactionFidelityCard, Setting } = require("../models");
 
 const createCaisse = async (req, res) => {
   try {
@@ -160,10 +160,14 @@ const loginCaisse = async (req, res) => {
     // Générer un token JWT sans durée de vie spécifiée
     const token = jwt.sign({ id: existingCaisse.id }, process.env.JWT_SECRET);
 
+    const setting = await Setting.findByPk(1);
+    const cashbackAmount = setting ? setting.cashbackAmount : 0;
+
     const caisseResponse = {
       shopName: existingCaisse.Shop.name,
       firstName: existingCaisse.firstName,
       lastName: existingCaisse.lastName,
+      cashback: cashbackAmount,
       token,
     };
 
