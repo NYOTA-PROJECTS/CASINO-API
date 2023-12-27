@@ -162,7 +162,7 @@ const listActivePromotions = async (req, res) => {
     const activePromotions = await Promotion.findAll({
       where: {
         endAt: {
-          [Op.lte]: currentDate, // Op.lte signifie "inférieur ou égal"
+          [Op.lte]: '2024-11-11', // Op.lte signifie "inférieur ou égal"
         },
       },
       include: {

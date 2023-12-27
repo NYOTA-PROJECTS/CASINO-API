@@ -279,7 +279,8 @@ const registerWithAccount = async (req, res) => {
       phone: newUser.phone,
       barcode: newUser.barcode,
       sponsoringCode: newUser.sponsoringCode,
-      cashback: cashback.amount,
+      imageUrl: newUser.imageUrl,
+      whatsapp: newUser.isWhatsapp,
       token: token,
     };
 
@@ -524,10 +525,12 @@ const registerWithoutAccount = async (req, res) => {
     const userResponse = {
       firstName: user.firstName,
       lastName: user.lastName,
+      birthday: user.birthday,
       phone: user.phone,
-      sponsorId: user.sponsorId,
       barcode: user.barcode,
-      isWhatsapp: user.isWhatsapp,
+      sponsoringCode: user.sponsoringCode,
+      imageUrl: user.imageUrl,
+      whatsapp: user.isWhatsapp,
       token: token,
     };
 
@@ -658,6 +661,7 @@ const login = async (req, res) => {
       sponsoringCode: user.sponsoringCode,
       imageUrl: user.imageUrl,
       cashback: cashbackAmount,
+      whatsapp: newUser.isWhatsapp,
       token: token,
     };
 
