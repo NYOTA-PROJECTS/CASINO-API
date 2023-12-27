@@ -155,6 +155,7 @@ const deletePromotion = async (req, res) => {
 
 const listActivePromotions = async (req, res) => {
   try {
+
     // Récupérer la date actuelle
     const currentDate = new Date();
     const formattedCurrentDate = currentDate.toISOString().split('T')[0];
@@ -164,7 +165,7 @@ const listActivePromotions = async (req, res) => {
     const activePromotions = await Promotion.findAll({
       where: {
         endAt: {
-          [Op.lte]: `${formattedCurrentDate}`, // Op.lte signifie "inférieur ou égal"
+          [Op.gte]: formattedCurrentDate, // Op.gte signifie "supérieur ou égal"
         },
       },
       include: {
