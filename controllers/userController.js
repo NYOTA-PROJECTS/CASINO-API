@@ -664,6 +664,36 @@ const login = async (req, res) => {
   }
 };
 
+const listUsers = async (req, res) => {
+  try {
+    const users = await User.findAll();
+
+    const userResponse = users.map((user) => {
+      return {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        birthday: user.birthday,
+        phone: user.phone,
+        barcode: user.barcode,
+        sponsoringCode: user.sponsoringCode,
+        imageUrl: user.imageUrl,
+        cashback: user.cashback,
+        whatsapp: user.isWhatsapp,
+      };
+    })
+    res.status(200).json({
+      status: "success",
+      users: userResponse,
+    });
+  } catch (error) {
+    console.error(`Error listing users: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la recuperation de tous les utilisateurs.",
+    });
+  }
+}
+
 module.exports = {
   userCheck,
   validateCode,
@@ -672,4 +702,5 @@ module.exports = {
   updateProfileImage,
   checkCode,
   login,
+  listUsers,
 };

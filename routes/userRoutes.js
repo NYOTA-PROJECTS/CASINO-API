@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const sharp = require("sharp");
 const userController = require("../controllers/userController");
+const adminTokenMiddleware = require("../middlewares/adminTokenMiddleware");
 const userTokenMiddleware = require("../middlewares/userTokenMiddleware");
 const router = express.Router();
 
@@ -25,6 +26,80 @@ const upload = multer({
     }
   },
 });
+
+/**
+ * @swagger
+ * /api/v1/user/list-all:
+ *   get:
+ *     summary: Liste des utilisateurs
+ *     description: Récupère la liste de tous les utilisateurs enregistrés.
+ *     tags:
+ *       - Utilisateur
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer de l'administrateur.
+ *     responses:
+ *       200:
+ *         description: Succès - La liste des utilisateurs a été récupérée avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       firstName:
+ *                         type: string
+ *                         example: John
+ *                       lastName:
+ *                         type: string
+ *                         example: Doe
+ *                       birthday:
+ *                         type: string
+ *                         format: date
+ *                         example: 2000-01-01
+ *                       phone:
+ *                         type: string
+ *                         example: "123456789"
+ *                       barcode:
+ *                         type: string
+ *                         example: "abcdef123456"
+ *                       sponsoringCode:
+ *                         type: string
+ *                         example: "abc123"
+ *                       imageUrl:
+ *                         type: string
+ *                         example: "https://example.com/profile.jpg"
+ *                       cashback:
+ *                         type: number
+ *                         example: 50.00
+ *                       whatsapp:
+ *                         type: boolean
+ *                         example: true
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la récupération de tous les utilisateurs."
+ */
+router.get("/list-all", adminTokenMiddleware, userController.listUsers);
 
 /**
  * @swagger
