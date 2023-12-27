@@ -14,6 +14,10 @@ module.exports = {
         defaultValue: 0,
         allowNull: false,
       },
+      voucherDurate: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

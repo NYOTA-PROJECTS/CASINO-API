@@ -2,64 +2,60 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('TransactionFidelityCards', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      barcode: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
-      },
-      sponsorId: {
+      userId: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'Users',
           key: 'id',
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      sponsoringCode: {
-        type: Sequelize.STRING,
+      caisseId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Caisse',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      paymentType: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true
+        defaultValue: 1
       },
-      firstName: {
+      ticketDate: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      lastName: {
+      ticketNumber: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      imageUrl: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      phone: {
-        type: Sequelize.STRING,
+      ticketAmount: {
+        type: Sequelize.DOUBLE,
         allowNull: false,
-        unique: true
+        defaultValue: 0
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      birthday: {
-        type: Sequelize.DATEONLY,
-        allowNull: true
-      },
-      isWhatsapp: {
-        type: Sequelize.BOOLEAN,
+      ticketCashback: {
+        type: Sequelize.DOUBLE,
         allowNull: false,
-        defaultValue: false
+        defaultValue: 0
       },
-      token: {
-        type: Sequelize.STRING,
-        allowNull: true
+      state: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1
       },
       createdAt: {
         allowNull: false,
@@ -73,6 +69,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('TransactionFidelityCards');
   }
 };

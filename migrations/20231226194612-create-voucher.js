@@ -2,64 +2,62 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Vouchers', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      barcode: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
-      },
-      sponsorId: {
+      userId: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'Users',
           key: 'id',
-        }
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      sponsoringCode: {
-        type: Sequelize.STRING,
+      caisseId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Caisses',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      amount: {
+        type: Sequelize.DOUBLE,
         allowNull: false,
-        unique: true
+        defaultValue: 0
       },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      lastName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      imageUrl: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      birthday: {
+      expirateDate: {
         type: Sequelize.DATEONLY,
-        allowNull: true
+        allowNull: false
       },
-      isWhatsapp: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
-      token: {
+      ticketDate: {
         type: Sequelize.STRING,
         allowNull: true
+      },
+      ticketNumber: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      ticketAmount: {
+        type: Sequelize.DOUBLE,
+        allowNull: true
+      },
+      ticketCashback: {
+        type: Sequelize.DOUBLE,
+        allowNull: true
+      },
+      state: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1
       },
       createdAt: {
         allowNull: false,
@@ -73,6 +71,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Vouchers');
   }
 };

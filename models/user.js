@@ -12,7 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.User, { foreignKey: 'sponsorId', onDelete: 'CASCADE' });
-      this.hasMany(models.Cashback, { foreignKey: 'userId', as: 'cashback' });
+      this.hasOne(models.Cashback, { foreignKey: 'userId', as: 'cashback' });
+      this.hasOne(models.UserCashback, { foreignKey: 'userId', as: 'usercashback' });
+      this.hasOne(models.Voucher, { foreignKey: 'userId', as: 'voucher' });
       this.hasMany(models.SponsoringWallet, { foreignKey: 'userId', as: 'sponsoringwallet' });
     }
   }
@@ -55,7 +57,16 @@ module.exports = (sequelize, DataTypes) => {
     birthday: {
       type: DataTypes.DATE,
       allowNull: true
-    }
+    },
+    isWhatsapp: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'User',

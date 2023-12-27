@@ -207,12 +207,6 @@ const registerWithAccount = async (req, res) => {
       });
     }
 
-    if (!birthday) {
-      return res.status(400).json({
-        status: "error",
-        message: "Veuillez fournir votre date d'anniversaire.",
-      });
-    }
 
     if (!amount) {
       return res.status(400).json({
