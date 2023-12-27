@@ -11,6 +11,7 @@ const {
   Cashback,
   SponsoringWallet,
   SettingSponsoring,
+  UserCashback,
 } = require("../models");
 const accountSid = "ACa1159c8d1faa08ab522ea1705fa55f6f";
 const authToken = "de90c1334e51e3d3d32d88dd9e9b074b";
@@ -282,6 +283,11 @@ const registerWithAccount = async (req, res) => {
       token: token,
     };
 
+    await UserCashback.create({
+      userId: newUser.id,
+      amount: 5000,
+    });
+
     return res.status(201).json({
       status: "success",
       user: userResponse,
@@ -492,10 +498,14 @@ const registerWithoutAccount = async (req, res) => {
       sponsoringCode: mySponsorCode,
     });
 
+    await UserCashback.create({
+      userId: user.id,
+      amount: 5000,
+    });
+
     if (sponsorCode) {
-      const sponsingAmount = SettingSponsoring.findOne({
-        where: { godsonAmount },
-      });
+      const setting = await SettingSponsoring.findByPk(1);
+      const sponsingAmount = setting ? setting.godsonAmount : 0;
       await SponsoringWallet.create({
         userId: user.id,
         amount: sponsingAmount,
@@ -694,6 +704,221 @@ const list = async (req, res) => {
   }
 }
 
+const getCashback = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token non fourni." });
+    }
+
+    // Vérifiez si l'en-tête commence par "Bearer "
+    if (!token.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Format de token invalide." });
+    }
+    // Extrait le token en supprimant le préfixe "Bearer "
+    const userToken = token.substring(7);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .json({ status: "error", message: "TokenExpiredError" });
+      }
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token invalide." });
+    }
+    const userId = decodedToken.id;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Utilisateur non trouvé." });
+    }
+
+    const userCashback = await Cashback.findOne({
+      where: { userId: user.id },
+    });
+
+    const cashbackAmount = userCashback.amount;
+
+    res.status(200).json({
+      status: "success",
+      cashback: cashbackAmount,
+    })
+
+  } catch (error) {
+    console.error(`Error getting user cashback: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la recuperation du cashback de l'utilisateur.",
+    });
+  }
+}
+
+const updateCashbackLimit = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    const { amount } = req.body;
+    
+    if (!token) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token non fourni." });
+    }
+
+    if (!amount) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Montant non fourni." });
+    }
+    if (!token.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Format de token invalide." });
+    }
+    const userToken = token.substring(7);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .json({ status: "error", message: "TokenExpiredError" });
+      }
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token invalide." });
+    }
+    const userId = decodedToken.id;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Utilisateur non trouvé." });
+    }
+    const userCashback = await UserCashback.findOne({
+      where: { userId: user.id },
+    });
+
+    if (!userCashback) {
+      await UserCashback.create({
+        userId: user.id,
+        amount: amount,
+      });
+      return res.status(200).json({
+        status: "success",
+        message: "Cashback creé avec succes.",
+      });
+    }
+
+    userCashback.amount = amount;
+
+    await userCashback.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Cashback mis à jour avec succes.",
+    })
+  } catch (error) {
+    console.error(`Error updating cashback user: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la mise à jour du cashback.",
+    });
+  }
+}
+
+const getCashbackLimit = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token non fourni." });
+    }
+
+    // Vérifiez si l'en-tête commence par "Bearer "
+    if (!token.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Format de token invalide." });
+    }
+    // Extrait le token en supprimant le préfixe "Bearer "
+    const userToken = token.substring(7);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .json({ status: "error", message: "TokenExpiredError" });
+      }
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token invalide." });
+    }
+    const userId = decodedToken.id;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Utilisateur non trouvé." });
+    }
+
+    const userCashback = await UserCashback.findOne({
+      where: { userId: user.id },
+    });
+
+    const cashbackAmount = userCashback.amount;
+
+    res.status(200).json({
+      status: "success",
+      cashback: cashbackAmount,
+    })
+
+  } catch (error) {
+    console.error(`Error getting user cashback limit: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la recuperation du cashback de l'utilisateur.",
+    });
+  }
+}
+
+const getSponsoringAmount = async (req, res) => {
+  try {
+    const setting = await SettingSponsoring.findByPk(1);
+    const godsonAmount = setting ? setting.godsonAmount : 0;
+    const godfatherAmount = setting ? setting.godfatherAmount : 0;
+
+    const response = {
+      godsonAmount: godsonAmount,
+      godfatherAmount: godfatherAmount
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: response
+    })
+    
+  } catch (error) {
+    console.error(`Error getting refferral amount: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la recuperation des montant de parrainage des utilisateurs.",
+    })
+  }
+}
+
 module.exports = {
   userCheck,
   validateCode,
@@ -703,4 +928,8 @@ module.exports = {
   checkCode,
   login,
   list,
+  getCashback,
+  updateCashbackLimit,
+  getCashbackLimit,
+  getSponsoringAmount,
 };

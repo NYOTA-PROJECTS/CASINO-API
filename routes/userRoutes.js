@@ -758,4 +758,277 @@ router.post("/check-sponsoring-code", userController.checkCode);
  */
 router.post("/login", userController.login);
 
+/**
+ * @swagger
+ * /api/v1/user/cashback-amount:
+ *   get:
+ *     summary: Récupérer le cashback de l'utilisateur
+ *     description: Récupère le montant du cashback associé à l'utilisateur authentifié.
+ *     tags:
+ *       - Utilisateur
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer.
+ *     responses:
+ *       200:
+ *         description: Succès - Le montant du cashback de l'utilisateur a été récupéré avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 cashback:
+ *                   type: number
+ *                   example: 50.00
+ *       401:
+ *         description: Erreur d'authentification - Veuillez fournir un token valide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Token non fourni."
+ *       404:
+ *         description: Utilisateur non trouvé - L'utilisateur associé au token n'a pas été trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé."
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la récupération du cashback de l'utilisateur."
+ */
+router.get("/cashback-amount",  userController.getCashback);
+
+/**
+ * @swagger
+ * /api/v1/user/cashback-limi:
+ *   get:
+ *     summary: Récupérer la limite du cashback de l'utilisateur
+ *     description: Récupère le montant du cashback limite définis par l'utilisateur authentifié.
+ *     tags:
+ *       - Utilisateur
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer.
+ *     responses:
+ *       200:
+ *         description: Succès - Le montant du cashback de l'utilisateur a été récupéré avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 cashback:
+ *                   type: number
+ *                   example: 50.00
+ *       401:
+ *         description: Erreur d'authentification - Veuillez fournir un token valide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Token non fourni."
+ *       404:
+ *         description: Utilisateur non trouvé - L'utilisateur associé au token n'a pas été trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé."
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la récupération du cashback de l'utilisateur."
+ */
+router.get("/cashback-limit",  userController.getCashbackLimit);
+
+/**
+ * @swagger
+ * /api/v1/user/sponsoring-amount:
+ *   get:
+ *     summary: Récupérer les montants de parrainage
+ *     description: Récupère les montants associés aux parrainages (filleul et parrain).
+ *     tags:
+ *       - Utilisateur
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer.
+ *     responses:
+ *       200:
+ *         description: Succès - Les montants de parrainage ont été récupérés avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     godsonAmount:
+ *                       type: number
+ *                       example: 10.00
+ *                       description: Montant associé au filleul.
+ *                     godfatherAmount:
+ *                       type: number
+ *                       example: 5.00
+ *                       description: Montant associé au parrain.
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la récupération des montants de parrainage."
+ */
+router.get("/sponsoring-amount", userController.getSponsoringAmount);
+
+/**
+ * @swagger
+ * /api/v1/user/update-cashback-limit:
+ *   put:
+ *     summary: Mettre à jour le montant du cashback de l'utilisateur
+ *     description: Met à jour le montant du cashback associé à l'utilisateur authentifié.
+ *     tags:
+ *       - Utilisateur
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer.
+ *       - in: body
+ *         name: updateCashbackData
+ *         description: Données de mise à jour du montant du cashback
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             amount:
+ *               type: number
+ *               description: Nouveau montant du cashback
+ *               example: 75.00
+ *     responses:
+ *       200:
+ *         description: Succès - Le montant du cashback de l'utilisateur a été mis à jour avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: "Cashback mis à jour avec succès."
+ *       401:
+ *         description: Erreur d'authentification - Veuillez fournir un token valide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Token non fourni."
+ *       404:
+ *         description: Utilisateur non trouvé - L'utilisateur associé au token n'a pas été trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé."
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la mise à jour du cashback."
+ */
+router.put("/update-cashback-limit", userController.updateCashbackLimit);
+
 module.exports = router;
