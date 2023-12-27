@@ -159,7 +159,6 @@ const listActivePromotions = async (req, res) => {
     // Récupérer la date actuelle
     const currentDate = new Date();
     const formattedCurrentDate = currentDate.toISOString().split('T')[0];
-    console.log('-----------------FormattedCurrentDate: ------------>', formattedCurrentDate);
 
     // Trouver les promotions actives
     const activePromotions = await Promotion.findAll({

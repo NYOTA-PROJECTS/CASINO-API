@@ -12,6 +12,7 @@ const {
   SponsoringWallet,
   SettingSponsoring,
   UserCashback,
+  TransactionFidelityCard,
 } = require("../models");
 const accountSid = "ACa1159c8d1faa08ab522ea1705fa55f6f";
 const authToken = "de90c1334e51e3d3d32d88dd9e9b074b";
@@ -923,6 +924,70 @@ const getSponsoringAmount = async (req, res) => {
   }
 }
 
+const getTransactions = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token non fourni." });
+    }
+
+    // Vérifiez si l'en-tête commence par "Bearer "
+    if (!token.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Format de token invalide." });
+    }
+    // Extrait le token en supprimant le préfixe "Bearer "
+    const userToken = token.substring(7);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .json({ status: "error", message: "TokenExpiredError" });
+      }
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token invalide." });
+    }
+    const userId = decodedToken.id;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Utilisateur non trouvé." });
+    }
+
+    const transaction = await TransactionFidelityCard.findAll({
+      where: { userId: user.id },
+    });
+
+    const transactionsResponse = transaction.map((transaction) => ({
+      id: transaction.id,
+      ticketNumber: transaction.ticketNumber,
+      ticketNumber: transaction.ticketNumber,
+      ticketAmount: transaction.ticketAmount,
+      ticketCashback: transaction.ticketCashback,
+    }));
+
+    res.status(200).json({
+      status: 'success',
+      transactions: transactionsResponse,
+    });
+
+  } catch (error) {
+    console.error(`Error getting user transaction: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la recuperation des transactions de l'utilisateur.",
+    });
+  }
+}
+
 module.exports = {
   userCheck,
   validateCode,
@@ -936,4 +1001,5 @@ module.exports = {
   updateCashbackLimit,
   getCashbackLimit,
   getSponsoringAmount,
+  getTransactions,
 };

@@ -952,6 +952,81 @@ router.get("/sponsoring-amount", userController.getSponsoringAmount);
 
 /**
  * @swagger
+ * /api/v1/user/transactions:
+ *   get:
+ *     summary: Récupérer les transactions de l'utilisateur
+ *     description: Récupère les transactions associées à l'utilisateur.
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *         description: Token d'authentification Bearer.
+ *     responses:
+ *       200:
+ *         description: Succès - Les transactions de l'utilisateur ont été récupérées avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                         description: ID de la transaction.
+ *                       ticketNumber:
+ *                         type: string
+ *                         example: "ABC123"
+ *                         description: Numéro du ticket.
+ *                       ticketAmount:
+ *                         type: number
+ *                         example: 50.00
+ *                         description: Montant du ticket.
+ *                       ticketCashback:
+ *                         type: number
+ *                         example: 5.00
+ *                         description: Montant de cashback associé au ticket.
+ *       401:
+ *         description: Non autorisé - Veuillez fournir un token d'authentification valide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Token non fourni."
+ *       500:
+ *         description: Erreur interne du serveur - Vérifiez les journaux pour plus de détails.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur s'est produite lors de la récupération des transactions de l'utilisateur."
+ */
+router.get("/transactions", userController.getTransactions);
+
+/**
+ * @swagger
  * /api/v1/user/update-cashback-limit:
  *   put:
  *     summary: Mettre à jour le montant du cashback de l'utilisateur
