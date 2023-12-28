@@ -12,7 +12,9 @@ const {
   SponsoringWallet,
   SettingSponsoring,
   UserCashback,
+  Setting,
   TransactionFidelityCard,
+  Voucher,
 } = require("../models");
 const accountSid = "ACa1159c8d1faa08ab522ea1705fa55f6f";
 const authToken = "de90c1334e51e3d3d32d88dd9e9b074b";
@@ -625,24 +627,20 @@ const login = async (req, res) => {
     const user = await User.findOne({ where: { phone } });
     if (!user) {
       // Si l'utilisateur n'existe pas, demandez de créer un compte
-      return res
-        .status(401)
-        .json({
-          status: "error",
-          message:
-            "Numéro de téléphone non enregistré. Veuillez créer un compte.",
-        });
+      return res.status(401).json({
+        status: "error",
+        message:
+          "Numéro de téléphone non enregistré. Veuillez créer un compte.",
+      });
     }
 
     // Vérifiez si le mot de passe est valide
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res
-        .status(401)
-        .json({
-          status: "error",
-          message: "Numéro de téléphone ou mot de passe incorrect.",
-        });
+      return res.status(401).json({
+        status: "error",
+        message: "Numéro de téléphone ou mot de passe incorrect.",
+      });
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
@@ -662,7 +660,7 @@ const login = async (req, res) => {
       sponsoringCode: user.sponsoringCode,
       imageUrl: user.imageUrl,
       cashback: cashbackAmount,
-      whatsapp: newUser.isWhatsapp,
+      whatsapp: user.isWhatsapp,
       token: token,
     };
 
@@ -695,7 +693,7 @@ const list = async (req, res) => {
         cashback: user.cashback,
         whatsapp: user.isWhatsapp,
       };
-    })
+    });
     res.status(200).json({
       status: "success",
       users: userResponse,
@@ -704,10 +702,11 @@ const list = async (req, res) => {
     console.error(`Error listing users: ${error}`);
     res.status(500).json({
       status: "error",
-      message: "Une erreur s'est produite lors de la recuperation de tous les utilisateurs.",
+      message:
+        "Une erreur s'est produite lors de la recuperation de tous les utilisateurs.",
     });
   }
-}
+};
 
 const getCashback = async (req, res) => {
   try {
@@ -756,22 +755,22 @@ const getCashback = async (req, res) => {
     res.status(200).json({
       status: "success",
       cashback: cashbackAmount,
-    })
-
+    });
   } catch (error) {
     console.error(`Error getting user cashback: ${error}`);
     res.status(500).json({
       status: "error",
-      message: "Une erreur s'est produite lors de la recuperation du cashback de l'utilisateur.",
+      message:
+        "Une erreur s'est produite lors de la recuperation du cashback de l'utilisateur.",
     });
   }
-}
+};
 
 const updateCashbackLimit = async (req, res) => {
   try {
     const token = req.headers.authorization;
     const { amount } = req.body;
-    
+
     if (!token) {
       return res
         .status(401)
@@ -831,7 +830,7 @@ const updateCashbackLimit = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Cashback mis à jour avec succes.",
-    })
+    });
   } catch (error) {
     console.error(`Error updating cashback user: ${error}`);
     res.status(500).json({
@@ -839,7 +838,7 @@ const updateCashbackLimit = async (req, res) => {
       message: "Une erreur s'est produite lors de la mise à jour du cashback.",
     });
   }
-}
+};
 
 const getCashbackLimit = async (req, res) => {
   try {
@@ -888,16 +887,16 @@ const getCashbackLimit = async (req, res) => {
     res.status(200).json({
       status: "success",
       cashback: cashbackAmount,
-    })
-
+    });
   } catch (error) {
     console.error(`Error getting user cashback limit: ${error}`);
     res.status(500).json({
       status: "error",
-      message: "Une erreur s'est produite lors de la recuperation du cashback de l'utilisateur.",
+      message:
+        "Une erreur s'est produite lors de la recuperation du cashback de l'utilisateur.",
     });
   }
-}
+};
 
 const getSponsoringAmount = async (req, res) => {
   try {
@@ -907,22 +906,22 @@ const getSponsoringAmount = async (req, res) => {
 
     const response = {
       godsonAmount: godsonAmount,
-      godfatherAmount: godfatherAmount
-    }
+      godfatherAmount: godfatherAmount,
+    };
 
     res.status(200).json({
       status: "success",
-      data: response
-    })
-    
+      data: response,
+    });
   } catch (error) {
     console.error(`Error getting refferral amount: ${error}`);
     res.status(500).json({
       status: "error",
-      message: "Une erreur s'est produite lors de la recuperation des montant de parrainage des utilisateurs.",
-    })
+      message:
+        "Une erreur s'est produite lors de la recuperation des montant de parrainage des utilisateurs.",
+    });
   }
-}
+};
 
 const getTransactions = async (req, res) => {
   try {
@@ -975,18 +974,232 @@ const getTransactions = async (req, res) => {
     }));
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       transactions: transactionsResponse,
     });
-
   } catch (error) {
     console.error(`Error getting user transaction: ${error}`);
     res.status(500).json({
       status: "error",
-      message: "Une erreur s'est produite lors de la recuperation des transactions de l'utilisateur.",
+      message:
+        "Une erreur s'est produite lors de la recuperation des transactions de l'utilisateur.",
     });
   }
-}
+};
+
+const getUserVoucher = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token non fourni." });
+    }
+
+    // Vérifiez si l'en-tête commence par "Bearer "
+    if (!token.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Format de token invalide." });
+    }
+    // Extrait le token en supprimant le préfixe "Bearer "
+    const userToken = token.substring(7);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .json({ status: "error", message: "TokenExpiredError" });
+      }
+      return res
+        .status(401)
+        .json({ status: "error", message: "Token invalide." });
+    }
+    const userId = decodedToken.id;
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "L'utilisateur n'existe pas.",
+      });
+    }
+
+    // Recherche du bon d'achat de l'utilisateur avec state=1
+    const userVoucher = await Voucher.findOne({
+      where: {
+        userId: userId,
+        state: 1,
+      },
+    });
+
+    if (!userVoucher) {
+      return res.status(404).json({
+        status: "error",
+        message: "Aucun bon d'achat actif trouvé pour cet utilisateur.",
+      });
+    }
+
+    const voucherResponse = {
+      id: userVoucher.id,
+      amount: userVoucher.amount,
+      expirateDate: userVoucher.expirateDate,
+      ticketDate: userVoucher.ticketDate,
+      ticketNumber: userVoucher.ticketNumber,
+      ticketAmount: userVoucher.ticketAmount,
+      ticketCashback: userVoucher.ticketCashback,
+      state: userVoucher.state,
+    };
+
+    res.status(200).json({
+      status: "success",
+      voucher: voucherResponse,
+    });
+  } catch (error) {
+    console.error(`ERROR GET USER VOUCHER: ${error}`);
+    res.status(500).json({
+      status: "error",
+      message:
+        "Une erreur s'est produite lors de la récupération du bon d'achat de l'utilisateur.",
+    });
+  }
+};
+
+const generateVoucher = async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({ status: "error", message: "Token non fourni." });
+    }
+
+    // Vérifiez si l'en-tête commence par "Bearer "
+    if (!token.startsWith("Bearer ")) {
+      return res.status(401).json({ status: "error", message: "Format de token invalide." });
+    }
+
+    // Extrait le token en supprimant le préfixe "Bearer "
+    const userToken = token.substring(7);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ status: "error", message: "TokenExpiredError" });
+      }
+      return res.status(401).json({ status: "error", message: "Token invalide." });
+    }
+
+    const userId = decodedToken.id;
+
+    const user = await User.findByPk(userId, {
+      include: [
+        {
+          model: UserCashback,
+          as: "usercashback",
+        },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "Utilisateur non trouvé." });
+    }
+
+    const userCashback = user.usercashback;
+
+    if (!userCashback) {
+      return res.status(404).json({ status: "error", message: "Montant du cashback non trouvé pour cet utilisateur." });
+    }
+
+    const setting = await Setting.findOne();
+
+    if (!setting) {
+      return res.status(404).json({ status: "error", message: "Configuration non trouvée." });
+    }
+
+    const cashback = await Cashback.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+
+    if (!cashback) {
+      // Si le cashback n'existe pas encore, le créer
+      await Cashback.create({
+        userId: userId,
+        amount: 0, // Vous pouvez ajuster cela en fonction de vos besoins
+      });
+    }
+
+    const cashbackAmountThreshold = userCashback.amount;
+
+    if (cashback.amount < cashbackAmountThreshold) {
+      return res.status(400).json({
+        status: "error",
+        message: `Le montant du cashback est insuffisant. Minimum requis : ${cashbackAmountThreshold}.`,
+      });
+    }
+
+    // Récupérer le nombre de jours à ajouter à la date actuelle
+    const voucherDurate = setting.voucherDurate || 0;
+
+    // Calculer la date d'expiration en ajoutant le nombre de jours à la date actuelle
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + voucherDurate);
+
+    // Formater la date d'expiration au format YYYY-MM-DD
+    const formattedExpirationDate = expirationDate.toISOString().split("T")[0];
+
+    // Vérifier si un bon d'achat existe déjà pour cet utilisateur
+    const existingVoucher = await Voucher.findOne({
+      where: {
+        userId: userId,
+       // state: 1,  Ajouter d'autres conditions si nécessaire
+      },
+    });
+
+    if (existingVoucher) {
+      // Si un bon d'achat existe déjà, mettez à jour les informations et le champ state
+      const amountVoucher = existingVoucher.amount + cashbackAmountThreshold;
+      await existingVoucher.update({
+        amount: amountVoucher,
+        expirateDate: formattedExpirationDate,
+        state: 1
+      });
+    } else {
+      // Si aucun bon d'achat n'existe, créez-en un
+      await Voucher.create({
+        userId: userId,
+        amount: cashback.amount,
+        expirateDate: formattedExpirationDate,
+        state: 1,
+      });
+    }
+
+    // Réduire le montant du cashback de l'utilisateur après la génération ou la mise à jour du bon d'achat
+    await cashback.update({
+      amount: cashback.amount - cashbackAmountThreshold,
+    });
+
+    // Envoyer une réponse réussie avec un statut 200
+    return res.status(200).json({
+      status: "success",
+      message: "Bon d'achat généré ou mis à jour avec succès.",
+    });
+  } catch (error) {
+    console.error(`Erreur lors de la génération ou de la mise à jour du bon d'achat : ${error.message}`);
+
+    // Envoyer une réponse d'erreur avec le statut approprié (par exemple, 500 pour une erreur interne du serveur)
+    return res.status(500).json({
+      status: "error",
+      message: "Une erreur s'est produite lors de la génération ou de la mise à jour du bon d'achat.",
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   userCheck,
@@ -1002,4 +1215,6 @@ module.exports = {
   getCashbackLimit,
   getSponsoringAmount,
   getTransactions,
+  getUserVoucher,
+  generateVoucher,
 };
